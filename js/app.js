@@ -1,4 +1,4 @@
-// قائمة المدن
+// قائمة المدن الافتراضية
 const cities = {
     tobruk: { name: "طبرق", lat: "32.077376", lng: "23.959999" },
     benghazi: { name: "بنغازي", lat: "32.1167", lng: "20.0667" },
@@ -28,16 +28,19 @@ const els = {
     themeToggle: document.getElementById('theme-toggle'),
     sunIcon: document.getElementById('sun-icon'),
     moonIcon: document.getElementById('moon-icon'),
-    addCityForm: document.getElementById('add-city-form')
+    addCityForm: document.getElementById('add-city-form'),
+    smartInput: document.getElementById('smart-city-input'),
+    errorMsg: document.getElementById('error-msg'),
+    submitBtn: document.getElementById('submit-btn')
 };
 
-// توليد تواريخ الأيام كمرجعيات
+// توليد التواريخ
 const getLocalDateString = (offsetDays = 0) => {
     const d = new Date(Date.now() + (offsetDays * 86400000));
     return d.toLocaleDateString('en-CA'); 
 };
 
-// السحر هنا: تحويل الوقت المحلي للمدينة إلى رقم UTC 절대ي لتلافي أي خطأ في فروق التوقيت
+// تحويل الوقت إلى UTC بناء على الإزاحة
 const parseApiTimeToUTC = (dateStr, timeStr, offsetMinutes) => {
     if (!timeStr) return 0;
     const [time, modifier] = timeStr.split(' ');
@@ -46,11 +49,9 @@ const parseApiTimeToUTC = (dateStr, timeStr, offsetMinutes) => {
     if (modifier === 'PM') hours = parseInt(hours, 10) + 12;
     const pad = (n) => n.toString().padStart(2, '0');
     
-    // نكون التاريخ بتصريح انه UTC (Z)
     const isoStr = `${dateStr}T${pad(hours)}:${pad(minutes)}:${pad(seconds)}Z`;
     const localMs = new Date(isoStr).getTime();
     
-    // نطرح انحراف الـ API (بالدقائق) لنحصل على الـ UTC الحقيقي!
     return localMs - (offsetMinutes * 60000);
 };
 
@@ -59,7 +60,7 @@ const formatMetric = (h, m, s) => {
     return `${pad(h)}:${pad(m)}:${pad(s)}`;
 };
 
-// جلب البيانات من API الوحيد المعتمد
+// جلب البيانات من API sunrisesunset.io
 async function fetchSolarData(cityKey) {
     const city = cities[cityKey];
     const API_BASE = `https://api.sunrisesunset.io/json?lat=${city.lat}&lng=${city.lng}`;
@@ -84,7 +85,7 @@ async function fetchSolarData(cityKey) {
             fetchDay(dates.tomorrow)
         ]);
 
-        const offset = tData.utc_offset; // API يُرجع الإزاحة بالدقائق
+        const offset = tData.utc_offset; 
 
         solarBounds = {
             yesterdaySunset: parseApiTimeToUTC(dates.yesterday, yData.sunset, offset),
@@ -103,7 +104,7 @@ async function fetchSolarData(cityKey) {
 function updateClock() {
     if (!solarBounds) return;
 
-    const absoluteTimeMs = Date.now(); // التوقيت العالمي الموحد الحالي
+    const absoluteTimeMs = Date.now(); 
     const { yesterdaySunset, todaySunrise, todaySunset, tomorrowSunrise, utcOffsetMinutes } = solarBounds;
     let phase, startMs, endMs;
 
@@ -136,7 +137,6 @@ function updateClock() {
 
     const displayHour = propH + 1; 
     
-    // حساب التوقيت المحلي للمدينة المستهدفة
     const targetCityTimeMs = absoluteTimeMs + (utcOffsetMinutes * 60000);
     const localDate = new Date(targetCityTimeMs);
     const standardTimeStr = formatMetric(localDate.getUTCHours(), localDate.getUTCMinutes(), localDate.getUTCSeconds());
@@ -198,23 +198,69 @@ function createCityButton(key, cityObj) {
     els.citySelector.appendChild(btn);
 }
 
-// إضافة مدينة يدوياً بناءً على إحداثيات (بدون استخدام خرائط خارجية)
-els.addCityForm.addEventListener('submit', (e) => {
+// === الذكاء في معالجة المدخل (الرابط أو الاسم) ===
+els.addCityForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const name = document.getElementById('new-city-name').value.trim();
-    const lat = document.getElementById('new-city-lat').value.trim();
-    const lng = document.getElementById('new-city-lng').value.trim();
+    els.errorMsg.classList.add('hidden');
+    const inputVal = els.smartInput.value.trim();
+    if (!inputVal) return;
 
-    if (name && lat && lng) {
-        const cityKey = `city_${Date.now()}`;
-        cities[cityKey] = { name, lat, lng };
-        createCityButton(cityKey, cities[cityKey]);
-        
-        document.getElementById('new-city-name').value = '';
-        document.getElementById('new-city-lat').value = '';
-        document.getElementById('new-city-lng').value = '';
-        
-        loadCity(cityKey);
+    els.submitBtn.disabled = true;
+    els.submitBtn.textContent = 'جاري البحث...';
+
+    let finalName = "مدينة مخصصة";
+    let lat, lng;
+
+    try {
+        // 1. هل المدخل هو رابط يحتوي على lat و lng؟
+        if (inputVal.includes('lat=') && inputVal.includes('lng=')) {
+            const url = new URL(inputVal);
+            lat = url.searchParams.get('lat');
+            lng = url.searchParams.get('lng');
+            
+            // محاولة بديلة لاستخراج القيم عبر Regex إذا لم ينجح الـ URL parser
+            if (!lat || !lng) {
+                const latMatch = inputVal.match(/lat=([^&]+)/);
+                const lngMatch = inputVal.match(/lng=([^&]+)/);
+                if (latMatch && lngMatch) {
+                    lat = latMatch[1];
+                    lng = lngMatch[1];
+                }
+            }
+            finalName = "موقع من الـ API";
+        } 
+        // 2. إذا لم يكن رابطاً، ابحث عنه كاسم مدينة بالإنجليزية
+        else {
+            const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(inputVal)}&limit=1`);
+            const data = await res.json();
+            
+            if (data && data.length > 0) {
+                lat = data[0].lat;
+                lng = data[0].lon;
+                // أخذ الاسم القصير للمدينة
+                finalName = data[0].name || inputVal;
+            } else {
+                throw new Error("لم يتم العثور على المدينة. جرب تهجئة إنجليزية مختلفة.");
+            }
+        }
+
+        // إذا نجحنا في الحصول على إحداثيات
+        if (lat && lng) {
+            const cityKey = `city_${Date.now()}`;
+            cities[cityKey] = { name: finalName, lat: lat, lng: lng };
+            createCityButton(cityKey, cities[cityKey]);
+            els.smartInput.value = '';
+            loadCity(cityKey);
+        } else {
+            throw new Error("تأكد من صحة الرابط المدخل.");
+        }
+
+    } catch (err) {
+        els.errorMsg.textContent = err.message || "حدث خطأ غير متوقع.";
+        els.errorMsg.classList.remove('hidden');
+    } finally {
+        els.submitBtn.disabled = false;
+        els.submitBtn.textContent = 'بحث وإضافة';
     }
 });
 
