@@ -6,7 +6,7 @@ SolarisSwahili — Dynamic Swahili Time System for Libya
 
 Live Demo
 
-[SolarisSwahili Live Website](https://azzubairx.github.io/SolarisSwahili/?utm_source=chatgpt.com)
+[SolarisSwahili Live Website](https://azzubairx.github.io/SolarisSwahili/)
 
 
 ---
