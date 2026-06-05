@@ -1,0 +1,45 @@
+:root {
+    /* المظهر النهاري (Light Stone) */
+    --bg-color: #F4F4F2;
+    --surface: #EBEBE8;
+    --text-primary: #1C1C1A;
+    --text-secondary: #7A7A75;
+    --accent: #A3A39D;
+}
+
+body.theme-night {
+    /* المظهر الليلي (Dark Stone) */
+    --bg-color: #161615;
+    --surface: #1E1E1C;
+    --text-primary: #EAEAE6;
+    --text-secondary: #8B8B84;
+    --accent: #4A4A46;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    overflow-x: hidden;
+}
+
+/* تنسيقات أزرار المدن */
+.city-btn {
+    font-family: 'Tajawal', sans-serif;
+    font-size: 0.9rem;
+    padding: 0.25rem 1rem;
+    border-radius: 9999px;
+    color: var(--text-secondary);
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+
+.city-btn:hover {
+    color: var(--text-primary);
+}
+
+.city-btn.active {
+    color: var(--text-primary);
+    border-color: var(--accent);
+    background-color: var(--surface);
+    font-weight: 600;
+}
