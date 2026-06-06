@@ -1,72 +1,360 @@
+/* ============================================================================
+   SOLARIS SWAHILI - PROFESSIONAL DESIGN SYSTEM
+   Psychological, Visual, and Interactive Excellence
+   ============================================================================ */
+
+/* ============================================================================
+   1. DESIGN TOKENS & COLOR SYSTEM
+   ============================================================================ */
+
 :root {
-    /* المظهر النهاري الافتراضي (Day) - تباين عالي > 4.5:1 */
-    --bg-color: #F3F4F6;
+    /* Typography System */
+    --font-display: 'Playfair Display', serif;
+    --font-sans: 'Tajawal', 'Segoe UI', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    
+    /* Spacing Scale (8px base) */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-2xl: 3rem;
+    --spacing-3xl: 4rem;
+    
+    /* Shadows (depth system) */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
+    --shadow-2xl: 0 25px 50px rgba(0, 0, 0, 0.2);
+    
+    /* Border Radius (consistent curves) */
+    --radius-sm: 0.375rem;
+    --radius-md: 0.75rem;
+    --radius-lg: 1.5rem;
+    --radius-xl: 2rem;
+    --radius-full: 9999px;
+    
+    /* Transitions (purposeful motion) */
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-base: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Day Theme (Bright, Energetic) */
+    --bg-color: #FAFAF8;
     --surface: #FFFFFF;
-    --text-primary: #111827;
-    --text-secondary: #4B5563; /* تم تغميقه للتباين */
-    --accent: #D1D5DB;
-    --day-bar: #D97706; /* Amber 600 */
-    --night-bar: #4338CA; /* Indigo 700 */
+    --surface-secondary: #F5F3F0;
+    --text-primary: #1A1410;
+    --text-secondary: #6B6360;
+    --text-tertiary: #9A9390;
+    --accent: #D4A574;
+    --accent-light: #E8D5C4;
+    --accent-dark: #8B6F47;
+    --day-bar: #DC7F3A;
+    --night-bar: #4F46E5;
+    --success: #10B981;
+    --error: #EF4444;
+    --warning: #F59E0B;
+    
+    /* Swahili-inspired palette */
+    --swahili-sand: #E8D5C4;
+    --swahili-earth: #8B6F47;
+    --swahili-ocean: #1E5A8E;
+    --swahili-spice: #D97706;
+    --swahili-coral: #F97316;
 }
 
+/* Golden Hour Theme (Warm, Meditative) */
 body.theme-golden {
-    /* مظهر الفجر/الغسق (Golden Hour) */
-    --bg-color: #FDF6E3;
-    --surface: #FFFDF8;
-    --text-primary: #451A03; /* بني داكن */
-    --text-secondary: #78350F;
-    --accent: #E7E5E4;
-    --day-bar: #EA580C;
-    --night-bar: #3730A3;
+    --bg-color: #FEF9F3;
+    --surface: #FFFBF5;
+    --surface-secondary: #F9F3EB;
+    --text-primary: #5C4033;
+    --text-secondary: #8B7355;
+    --text-tertiary: #A89080;
+    --accent: #D4A574;
+    --accent-light: #E8D5C4;
+    --accent-dark: #B8956A;
+    --day-bar: #EA8B3D;
+    --night-bar: #6B5B95;
 }
 
+/* Night Theme (Deep, Contemplative) */
 body.theme-night {
-    /* المظهر الليلي (Night) - تباين عالي > 4.5:1 */
-    --bg-color: #0F172A;
-    --surface: #1E293B;
-    --text-primary: #F8FAFC;
-    --text-secondary: #94A3B8; /* رمادي فاتح */
-    --accent: #334155;
-    --day-bar: #F59E0B; /* Amber 500 */
-    --night-bar: #6366F1; /* Indigo 500 */
+    --bg-color: #0F0D0A;
+    --surface: #1A1815;
+    --surface-secondary: #2D2925;
+    --text-primary: #F5F1ED;
+    --text-secondary: #B8B0A8;
+    --text-tertiary: #8B8380;
+    --accent: #D4A574;
+    --accent-light: #E8D5C4;
+    --accent-dark: #C4956B;
+    --day-bar: #F59E0B;
+    --night-bar: #818CF8;
+    --success: #34D399;
+    --error: #F87171;
+    --warning: #FBBF24;
+}
+
+/* ============================================================================
+   2. GLOBAL STYLES & RESET
+   ============================================================================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+    color-scheme: light dark;
 }
 
 body {
     background-color: var(--bg-color);
     color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.6;
     overflow-x: hidden;
+    transition: background-color var(--transition-slow), color var(--transition-slow);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
-/* الخريطة الطبوغرافية */
+/* Respect user motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* ============================================================================
+   3. ATMOSPHERIC BACKGROUND LAYERS
+   ============================================================================ */
+
+/* Subtle topographic pattern */
 body::before {
     content: "";
     position: fixed;
     inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 50 Q 25 30, 50 50 T 100 50 M 0 70 Q 25 50, 50 70 T 100 70 M 0 30 Q 25 10, 50 30 T 100 30' fill='none' stroke='%23888888' stroke-width='0.5' opacity='0.1'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23888888;stop-opacity:0.08'/%3E%3Cstop offset='100%25' style='stop-color:%23888888;stop-opacity:0.02'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M0 50 Q 25 30, 50 50 T 100 50 M 0 70 Q 25 50, 50 70 T 100 70 M 0 30 Q 25 10, 50 30 T 100 30' fill='url(%23grad)' stroke='%23888888' stroke-width='0.3' opacity='0.06'/%3E%3C/svg%3E");
     background-size: 150px 150px;
     pointer-events: none;
     z-index: -2;
 }
 
-/* تنسيقات الأزرار مع تأثير تفاعلي (Accessibility & UX) */
-.city-btn {
-    font-family: 'Tajawal', sans-serif;
-    font-size: 0.95rem;
-    padding: 0.35rem 1.2rem;
-    border-radius: 9999px;
-    color: var(--text-secondary);
-    background-color: var(--surface);
-    border: 1px solid var(--accent);
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    cursor: pointer;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+/* Gradient overlay for depth */
+body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle at 50% 50%, transparent 0%, rgba(0, 0, 0, 0.02) 100%);
+    pointer-events: none;
+    z-index: -1;
 }
 
-.city-btn:hover, .city-btn:focus-visible {
+/* ============================================================================
+   4. TYPOGRAPHY SYSTEM
+   ============================================================================ */
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
     color: var(--text-primary);
-    border-color: var(--text-secondary);
-    outline: none;
+}
+
+h1 {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    margin-bottom: var(--spacing-lg);
+}
+
+h2 {
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    margin-bottom: var(--spacing-md);
+}
+
+h3 {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    margin-bottom: var(--spacing-md);
+}
+
+p {
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-md);
+    line-height: 1.7;
+}
+
+/* Proper ellipsis usage */
+.truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Prevent widow text on headings */
+h1, h2, h3 {
+    text-wrap: balance;
+}
+
+/* Tabular numbers for time displays */
+.time-display,
+.metric-display,
+#metric-display,
+#standard-time,
+#countdown-display {
+    font-variant-numeric: tabular-nums;
+    font-family: var(--font-mono);
+}
+
+/* ============================================================================
+   5. INTERACTIVE ELEMENTS - BUTTONS & CONTROLS
+   ============================================================================ */
+
+button {
+    font-family: var(--font-sans);
+    cursor: pointer;
+    border: none;
+    transition: all var(--transition-base);
+    position: relative;
+    overflow: hidden;
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Primary button style */
+.btn-primary {
+    background-color: var(--accent);
+    color: var(--text-primary);
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-radius: var(--radius-full);
+    font-weight: 600;
+    font-size: 0.95rem;
+    box-shadow: var(--shadow-md);
+    position: relative;
+}
+
+.btn-primary::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), transparent);
+    opacity: 0;
+    transition: opacity var(--transition-base);
+    border-radius: var(--radius-full);
+}
+
+.btn-primary:hover:not(:disabled) {
+    background-color: var(--accent-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.btn-primary:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.btn-primary:focus-visible {
+    outline: 2px solid var(--accent-dark);
+    outline-offset: 2px;
+}
+
+/* Secondary button style */
+.btn-secondary {
+    background-color: var(--surface-secondary);
+    color: var(--text-primary);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: 1.5px solid var(--accent-light);
+    border-radius: var(--radius-full);
+    font-weight: 500;
+    font-size: 0.9rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background-color: var(--accent-light);
+    border-color: var(--accent-dark);
     transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-secondary:focus-visible {
+    outline: 2px solid var(--accent-dark);
+    outline-offset: 2px;
+}
+
+/* Icon-only button (with proper accessibility) */
+.btn-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--surface);
+    border: 1.5px solid var(--accent-light);
+    color: var(--text-primary);
+    box-shadow: var(--shadow-md);
+    backdrop-filter: blur(10px);
+}
+
+.btn-icon:hover:not(:disabled) {
+    background-color: var(--accent-light);
+    border-color: var(--accent-dark);
+    transform: scale(1.05);
+}
+
+.btn-icon:focus-visible {
+    outline: 2px solid var(--accent-dark);
+    outline-offset: 2px;
+}
+
+/* City selector buttons */
+.city-btn {
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border-radius: var(--radius-full);
+    color: var(--text-secondary);
+    background-color: var(--surface);
+    border: 1.5px solid var(--accent-light);
+    transition: all var(--transition-base);
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    font-weight: 500;
+}
+
+.city-btn:hover {
+    color: var(--text-primary);
+    border-color: var(--accent);
+    background-color: var(--accent-light);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.city-btn:focus-visible {
+    outline: 2px solid var(--accent-dark);
+    outline-offset: 2px;
 }
 
 .city-btn.active {
@@ -74,18 +362,511 @@ body::before {
     background-color: var(--text-primary);
     border-color: var(--text-primary);
     font-weight: 700;
-    transform: translateY(0);
+    box-shadow: var(--shadow-lg);
 }
 
-/* نقطة الصلاة على القوس */
+/* ============================================================================
+   6. FORM CONTROLS
+   ============================================================================ */
+
+input,
+textarea,
+select {
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    color: var(--text-primary);
+    background-color: var(--surface);
+    border: 1.5px solid var(--accent-light);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-md);
+    transition: all var(--transition-base);
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: var(--text-tertiary);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    border-color: var(--accent-dark);
+    box-shadow: 0 0 0 3px rgba(212, 165, 116, 0.1);
+}
+
+input:disabled,
+textarea:disabled,
+select:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Remove default browser styling for select */
+select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236B6360' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    padding-right: 2.5rem;
+}
+
+/* ============================================================================
+   7. ANIMATIONS & TRANSITIONS
+   ============================================================================ */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
+@keyframes glow {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(212, 165, 116, 0.7);
+    }
+    50% {
+        box-shadow: 0 0 0 10px rgba(212, 165, 116, 0);
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -1000px 0;
+    }
+    100% {
+        background-position: 1000px 0;
+    }
+}
+
+/* Staggered animation delays */
+.stagger-1 { animation-delay: 0.1s; }
+.stagger-2 { animation-delay: 0.2s; }
+.stagger-3 { animation-delay: 0.3s; }
+.stagger-4 { animation-delay: 0.4s; }
+.stagger-5 { animation-delay: 0.5s; }
+
+/* ============================================================================
+   8. LOADER & LOADING STATES
+   ============================================================================ */
+
+#loader {
+    background: linear-gradient(135deg, var(--surface) 0%, var(--surface-secondary) 100%);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+#loader::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(212, 165, 116, 0.05), transparent);
+    pointer-events: none;
+}
+
+.spinner {
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 3px solid var(--accent-light);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Loading text with ellipsis animation */
+.loading-text::after {
+    content: "";
+    animation: dots 1.5s steps(4, end) infinite;
+}
+
+@keyframes dots {
+    0%, 20% { content: ""; }
+    40% { content: "."; }
+    60% { content: ".."; }
+    80%, 100% { content: "..."; }
+}
+
+/* ============================================================================
+   9. ERROR & ALERT STATES
+   ============================================================================ */
+
+#error-overlay {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.95), rgba(220, 38, 38, 0.95));
+    backdrop-filter: blur(20px);
+}
+
+.error-box {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-xl);
+    backdrop-filter: blur(10px);
+}
+
+.error-icon {
+    width: 3rem;
+    height: 3rem;
+    margin-bottom: var(--spacing-md);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+/* ============================================================================
+   10. PRAYER MARKERS & SVG INTERACTIONS
+   ============================================================================ */
+
 .prayer-marker {
     fill: var(--surface);
     stroke: var(--text-secondary);
     stroke-width: 2;
-    transition: all 0.3s;
+    transition: all var(--transition-base);
     cursor: help;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
 }
+
 .prayer-marker:hover {
-    fill: var(--text-primary);
+    fill: var(--accent);
+    stroke: var(--accent-dark);
     r: 6;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
+}
+
+.prayer-marker:focus-visible {
+    outline: 2px solid var(--accent-dark);
+    outline-offset: 2px;
+}
+
+/* SVG arc progress animation */
+#progress-arc {
+    transition: stroke-dashoffset var(--transition-slow) linear;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+/* Celestial body (sun/moon) */
+#sun-shape,
+#moon-shape {
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
+}
+
+/* ============================================================================
+   11. CARDS & CONTAINERS
+   ============================================================================ */
+
+.card {
+    background: var(--surface);
+    border: 1px solid var(--accent-light);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition-base);
+    backdrop-filter: blur(10px);
+}
+
+.card:hover {
+    border-color: var(--accent);
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+}
+
+.card-header {
+    background: linear-gradient(135deg, var(--accent-light) 0%, var(--surface-secondary) 100%);
+    border-bottom: 1px solid var(--accent-light);
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+}
+
+.card-body {
+    padding: var(--spacing-lg);
+}
+
+.card-footer {
+    background: var(--surface-secondary);
+    border-top: 1px solid var(--accent-light);
+    padding: var(--spacing-lg);
+    border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+}
+
+/* ============================================================================
+   12. TOOLTIPS & POPOVERS
+   ============================================================================ */
+
+.tooltip {
+    position: absolute;
+    background: var(--text-primary);
+    color: var(--surface);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    white-space: nowrap;
+    z-index: 1000;
+    box-shadow: var(--shadow-lg);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--transition-base), visibility var(--transition-base);
+    pointer-events: none;
+}
+
+.tooltip.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Smart tooltip positioning */
+.group:hover .tooltip,
+.group:focus-within .tooltip {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* ============================================================================
+   13. RESPONSIVE GRID & LAYOUT
+   ============================================================================ */
+
+.container {
+    width: 100%;
+    max-width: 42rem;
+    margin: 0 auto;
+    padding: 0 var(--spacing-md);
+}
+
+@media (min-width: 640px) {
+    .container {
+        padding: 0 var(--spacing-lg);
+    }
+}
+
+/* Flex utilities with proper min-width for truncation */
+.flex-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.flex-row > * {
+    min-width: 0;
+}
+
+.flex-col {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+/* ============================================================================
+   14. ACCESSIBILITY ENHANCEMENTS
+   ============================================================================ */
+
+/* Skip link for keyboard navigation */
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: var(--accent);
+    color: var(--text-primary);
+    padding: var(--spacing-sm) var(--spacing-md);
+    text-decoration: none;
+    z-index: 100;
+    border-radius: var(--radius-md);
+}
+
+.skip-link:focus {
+    top: 0;
+}
+
+/* Focus visible states */
+:focus-visible {
+    outline: 2px solid var(--accent-dark);
+    outline-offset: 2px;
+}
+
+/* Reduce motion for animations */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: more) {
+    button,
+    input,
+    select,
+    textarea {
+        border-width: 2px;
+    }
+    
+    .city-btn {
+        border-width: 2px;
+    }
+}
+
+/* ============================================================================
+   15. THEME TOGGLE & TRANSITIONS
+   ============================================================================ */
+
+/* Smooth theme transitions */
+body {
+    transition: background-color var(--transition-slow), color var(--transition-slow);
+}
+
+/* Theme icon animations */
+#sun-icon,
+#moon-icon {
+    transition: opacity var(--transition-base), transform var(--transition-base);
+}
+
+#sun-icon.hidden,
+#moon-icon.hidden {
+    opacity: 0;
+    transform: scale(0.8);
+    pointer-events: none;
+}
+
+/* ============================================================================
+   16. STARS LAYER (Night Mode)
+   ============================================================================ */
+
+#stars-layer {
+    transition: opacity var(--transition-slow);
+    background-size: 200px 200px;
+}
+
+/* ============================================================================
+   17. UTILITY CLASSES
+   ============================================================================ */
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+.pointer-events-none {
+    pointer-events: none;
+}
+
+.pointer-events-auto {
+    pointer-events: auto;
+}
+
+.touch-action-manipulation {
+    touch-action: manipulation;
+}
+
+/* Prevent double-tap zoom delay on touch */
+button,
+a,
+input[type="button"],
+input[type="submit"] {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* ============================================================================
+   18. RESPONSIVE DESIGN
+   ============================================================================ */
+
+@media (max-width: 640px) {
+    h1 {
+        font-size: 1.75rem;
+    }
+    
+    h2 {
+        font-size: 1.5rem;
+    }
+    
+    .city-btn {
+        padding: var(--spacing-sm) var(--spacing-md);
+        font-size: 0.85rem;
+    }
+    
+    .card {
+        padding: var(--spacing-md);
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        font-size: 0.95rem;
+    }
+    
+    h1 {
+        font-size: 1.5rem;
+    }
+    
+    .container {
+        padding: 0 var(--spacing-sm);
+    }
+}
+
+/* ============================================================================
+   19. PRINT STYLES
+   ============================================================================ */
+
+@media print {
+    body {
+        background: white;
+        color: black;
+    }
+    
+    button,
+    .btn-icon,
+    #theme-toggle,
+    #theme-auto-reset {
+        display: none;
+    }
+    
+    .card {
+        box-shadow: none;
+        border: 1px solid #ccc;
+        page-break-inside: avoid;
+    }
 }

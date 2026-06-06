@@ -3,121 +3,211 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>التوقيت السواحلي الديناميكي | ليبيا</title>
+    <meta name="theme-color" content="#FAFAF8">
+    <meta name="description" content="نظام التوقيت السواحلي الديناميكي - تتبع الوقت بناءً على حركة الشمس الحقيقية">
+    <meta name="color-scheme" content="light dark">
     
+    <title>النظام السواحلي | التوقيت الديناميكي</title>
+    
+    <!-- Preconnect to external resources -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600&family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://api.sunrisesunset.io">
+    <link rel="preconnect" href="https://api.aladhan.com">
+    
+    <!-- Google Fonts: Playfair Display + Tajawal + JetBrains Mono -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Tajawal:wght@300;400;500;700;800&family=JetBrains+Mono:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS for utility framework -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        tailwind.config = { darkMode: 'class', theme: { extend: { fontFamily: { sans: ['"Tajawal"', 'sans-serif'], mono: ['"JetBrains Mono"', 'monospace'] }, colors: { theme: { bg: 'var(--bg-color)', surface: 'var(--surface)', primary: 'var(--text-primary)', secondary: 'var(--text-secondary)', accent: 'var(--accent)', dayBar: 'var(--day-bar)', nightBar: 'var(--night-bar)' } } } } }
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        display: ['"Playfair Display"', 'serif'],
+                        sans: ['"Tajawal"', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace']
+                    },
+                    colors: {
+                        theme: {
+                            bg: 'var(--bg-color)',
+                            surface: 'var(--surface)',
+                            'surface-secondary': 'var(--surface-secondary)',
+                            primary: 'var(--text-primary)',
+                            secondary: 'var(--text-secondary)',
+                            tertiary: 'var(--text-tertiary)',
+                            accent: 'var(--accent)',
+                            'accent-light': 'var(--accent-light)',
+                            'accent-dark': 'var(--accent-dark)',
+                            dayBar: 'var(--day-bar)',
+                            nightBar: 'var(--night-bar)'
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-out',
+                        'slide-in-left': 'slideInLeft 0.5s ease-out',
+                        'slide-in-right': 'slideInRight 0.5s ease-out',
+                        'pulse-glow': 'glow 2s ease-in-out infinite',
+                        'shimmer': 'shimmer 2s infinite'
+                    },
+                    transitionTimingFunction: {
+                        'smooth': 'cubic-bezier(0.4, 0, 0.2, 1)'
+                    }
+                }
+            }
+        }
     </script>
+    
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="antialiased min-h-screen flex flex-col items-center py-6 px-4 transition-colors duration-[1500ms] ease-in-out relative">
     
-    <!-- النجوم المولدّة برمجياً -->
+    <!-- Skip to main content link for accessibility -->
+    <a href="#main-content" class="skip-link">انتقل إلى المحتوى الرئيسي</a>
+    
+    <!-- Animated stars layer (night mode) -->
     <div id="stars-layer" class="fixed inset-0 pointer-events-none z-[-1] transition-opacity duration-1000 opacity-0" aria-hidden="true"></div>
 
-    <!-- شاشة التحميل (Loader) -->
-    <div id="loader" role="status" aria-live="polite" class="fixed inset-0 z-[100] flex flex-col gap-4 items-center justify-center bg-theme-surface/90 backdrop-blur-md text-theme-primary transition-opacity duration-500">
+    <!-- Loading screen with accessible status -->
+    <div id="loader" role="status" aria-live="polite" aria-label="جاري تحميل التطبيق" class="fixed inset-0 z-[100] flex flex-col gap-4 items-center justify-center bg-theme-surface/90 backdrop-blur-md text-theme-primary transition-opacity duration-500">
         <div class="w-10 h-10 border-4 border-theme-accent border-t-theme-primary rounded-full animate-spin"></div>
-        <span id="loader-text" class="font-sans font-medium tracking-wide text-sm">جاري تهيئة النظام...</span>
+        <span id="loader-text" class="font-sans font-medium tracking-wide text-sm">جاري تهيئة النظام…</span>
     </div>
 
-    <!-- شاشة الخطأ (Error Overlay) -->
-    <div id="error-overlay" role="alert" class="fixed inset-0 z-[110] flex flex-col items-center justify-center bg-red-900/90 backdrop-blur-md text-white transition-opacity duration-500 opacity-0 pointer-events-none hidden">
-        <div class="bg-white/10 p-8 rounded-2xl flex flex-col items-center text-center max-w-sm border border-white/20">
-            <svg class="w-12 h-12 mb-4 text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+    <!-- Error overlay with accessible alerts -->
+    <div id="error-overlay" role="alert" aria-live="assertive" class="fixed inset-0 z-[110] flex flex-col items-center justify-center bg-red-900/90 backdrop-blur-md text-white transition-opacity duration-500 opacity-0 pointer-events-none hidden">
+        <div class="bg-white/10 p-8 rounded-2xl flex flex-col items-center text-center max-w-sm border border-white/20 error-box">
+            <svg class="w-12 h-12 mb-4 text-red-300 error-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+            </svg>
             <h2 class="text-xl font-bold mb-2">تعذر جلب البيانات</h2>
             <p id="error-message" class="text-sm text-red-100 mb-6 leading-relaxed">يرجى التحقق من اتصالك بالإنترنت.</p>
-            <button id="retry-btn" aria-label="إعادة المحاولة" class="bg-white text-red-900 px-6 py-2 rounded-full font-bold hover:bg-gray-200 transition-colors">إعادة المحاولة</button>
+            <button id="retry-btn" aria-label="إعادة المحاولة" class="bg-white text-red-900 px-6 py-2 rounded-full font-bold hover:bg-gray-200 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">إعادة المحاولة</button>
         </div>
     </div>
 
-    <!-- أزرار التحكم بالوضع -->
+    <!-- Theme control buttons with accessibility -->
     <div class="fixed top-6 left-6 z-50 flex gap-2">
-        <button id="theme-auto-reset" aria-label="إعادة الوضع التلقائي" class="p-3 rounded-full border border-theme-accent text-theme-secondary bg-theme-surface/80 hover:bg-theme-accent/50 shadow-sm backdrop-blur-sm transition-all hidden opacity-0 translate-x-4">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+        <button id="theme-auto-reset" aria-label="إعادة الوضع التلقائي" class="p-3 rounded-full border border-theme-accent text-theme-secondary bg-theme-surface/80 hover:bg-theme-accent/50 shadow-sm backdrop-blur-sm transition-all hidden opacity-0 translate-x-4 btn-icon focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-theme-accent-dark">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
         </button>
-        <button id="theme-toggle" aria-label="تبديل الوضع ليلي/نهاري" class="p-3 rounded-full border border-theme-accent text-theme-primary bg-theme-surface/80 hover:bg-theme-accent/50 shadow-md backdrop-blur-sm transition-all cursor-pointer">
-            <svg id="moon-icon" class="w-5 h-5 hidden" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
-            <svg id="sun-icon" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4.22 1.32a1 1 0 011.415 0l.707.707a1 1 0 01-1.414 1.414l-.707-.707a1 1 0 010-1.414zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM14.657 15.343a1 1 0 010 1.414l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 0zM10 18a1 1 0 01-1-1v-1a1 1 0 112 0v1a1 1 0 01-1 1zM5.343 15.343a1 1 0 01-1.414 0l-.707-.707a1 1 0 011.414-1.414l.707.707a1 1 0 010 1.414zM4 10a1 1 0 01-1 1H2a1 1 0 110-2h1a1 1 0 011 1zM5.343 4.657a1 1 0 010-1.414l.707-.707a1 1 0 011.414 1.414l-.707.707a1 1 0 01-1.414 0zM10 5a5 5 0 100 10 5 5 0 000-10z" clip-rule="evenodd"></path></svg>
+        <button id="theme-toggle" aria-label="تبديل الوضع ليلي/نهاري" class="p-3 rounded-full border border-theme-accent text-theme-primary bg-theme-surface/80 hover:bg-theme-accent/50 shadow-md backdrop-blur-sm transition-all cursor-pointer btn-icon focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-theme-accent-dark">
+            <svg id="moon-icon" class="w-5 h-5 hidden transition-all duration-300" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+            </svg>
+            <svg id="sun-icon" class="w-5 h-5 transition-all duration-300" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4.22 1.32a1 1 0 011.415 0l.707.707a1 1 0 01-1.414 1.414l-.707-.707a1 1 0 010-1.414zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM14.657 15.343a1 1 0 010 1.414l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 0zM10 18a1 1 0 01-1-1v-1a1 1 0 112 0v1a1 1 0 01-1 1zM5.343 15.343a1 1 0 01-1.414 0l-.707-.707a1 1 0 011.414-1.414l.707.707a1 1 0 010 1.414zM4 10a1 1 0 01-1 1H2a1 1 0 110-2h1a1 1 0 011 1zM5.343 4.657a1 1 0 010-1.414l.707-.707a1 1 0 011.414 1.414l-.707.707a1 1 0 01-1.414 0zM10 5a5 5 0 100 10 5 5 0 000-10z" clip-rule="evenodd"></path>
+            </svg>
         </button>
     </div>
 
+    <!-- Main content container -->
     <div class="w-full max-w-2xl flex flex-col gap-6 opacity-0 transition-opacity duration-1000 mt-12 md:mt-4" id="app-container">
         
-        <header class="bg-theme-surface/40 border border-theme-accent/30 rounded-2xl p-6 text-center shadow-sm backdrop-blur-md">
-            <h1 class="text-xl font-bold text-theme-primary mb-2">النظام السواحلي (الغروبي)</h1>
-            <p class="text-sm text-theme-secondary leading-relaxed max-w-lg mx-auto">
-                تعتمد هذه الساعة على حركة الشمس الحقيقية. يبدأ اليوم عند شروق الشمس (الساعة 1 نهاراً) وينتهي عند الغروب. 
-                يتم تقسيم فترة النهار إلى 12 ساعة نسبية، وفترة الليل إلى 12 ساعة أخرى.
+        <!-- Header section -->
+        <header class="bg-theme-surface/40 border border-theme-accent/30 rounded-2xl p-6 text-center shadow-sm backdrop-blur-md animate-fade-in">
+            <h1 class="text-2xl font-display font-bold text-theme-primary mb-3">النظام السواحلي</h1>
+            <p class="text-sm text-theme-secondary leading-relaxed max-w-lg mx-auto font-light">
+                نظام توقيت ديناميكي يتتبع حركة الشمس الحقيقية. يبدأ اليوم عند الشروق (الساعة 1) وينتهي عند الغروب، مع تقسيم النهار والليل إلى 12 ساعة نسبية لكل منهما.
             </p>
         </header>
 
-        <main class="w-full border border-theme-accent/30 bg-theme-surface/70 rounded-3xl p-8 shadow-2xl backdrop-blur-xl flex flex-col items-center">
+        <!-- Main content section -->
+        <main id="main-content" class="w-full border border-theme-accent/30 bg-theme-surface/70 rounded-3xl p-8 shadow-2xl backdrop-blur-xl flex flex-col items-center animate-fade-in stagger-1">
             
-            <!-- أشرطة المدن والبحث -->
+            <!-- City selector section -->
             <div class="w-full flex flex-col gap-4 mb-8 border-b border-theme-accent/20 pb-6">
                 <nav class="w-full flex flex-wrap justify-center gap-3" id="city-selector" aria-label="اختيار المدينة"></nav>
+                
                 <form id="add-city-form" class="flex flex-wrap items-center justify-center gap-2 mt-2 relative z-20">
                     <label for="smart-city-input" class="sr-only">اسم المدينة بالإنجليزية</label>
-                    <input type="text" id="smart-city-input" placeholder="اسم المدينة (مثال: London)" required class="bg-theme-surface/90 border border-theme-accent/60 text-theme-primary text-sm rounded-full px-5 py-3 focus:outline-none focus:ring-2 focus:ring-theme-secondary w-full max-w-[300px] text-center transition-all shadow-sm placeholder:text-theme-secondary/70" dir="ltr" autocomplete="off">
-                    <button type="submit" id="submit-btn" aria-label="إضافة المدينة" class="bg-theme-primary text-theme-surface text-sm font-bold rounded-full px-6 py-3 hover:opacity-80 transition-opacity shadow-sm">
+                    <input 
+                        type="text" 
+                        id="smart-city-input" 
+                        placeholder="اسم المدينة (مثال: London)…" 
+                        required 
+                        class="bg-theme-surface/90 border border-theme-accent/60 text-theme-primary text-sm rounded-full px-5 py-3 focus:outline-none focus:ring-2 focus:ring-theme-accent w-full max-w-[300px] text-center transition-all shadow-sm placeholder:text-theme-secondary/70" 
+                        dir="ltr" 
+                        autocomplete="off"
+                        spellcheck="false"
+                        aria-describedby="city-input-hint">
+                    <span id="city-input-hint" class="sr-only">أدخل اسم المدينة بالإنجليزية واضغط إضافة</span>
+                    <button 
+                        type="submit" 
+                        id="submit-btn" 
+                        aria-label="إضافة المدينة" 
+                        class="bg-theme-primary text-theme-surface text-sm font-bold rounded-full px-6 py-3 hover:opacity-80 transition-opacity shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-theme-accent-dark">
                         إضافة
                     </button>
                 </form>
             </div>
 
-            <!-- معلومات المدينة والتاريخ الهجري -->
+            <!-- City info and date section -->
             <div class="w-full flex flex-col items-center gap-2 mb-10 text-center">
-                <h1 class="text-2xl font-extrabold text-theme-primary tracking-wide" id="city-name">--</h1>
+                <h2 class="text-3xl font-display font-bold text-theme-primary tracking-wide" id="city-name">--</h2>
                 <div class="flex items-center gap-2 text-sm text-theme-secondary font-medium">
-                    <svg class="w-4 h-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                    <span id="hijri-date" aria-live="polite">--</span>
+                    <svg class="w-4 h-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                    <span id="hijri-date" aria-live="polite" aria-label="التاريخ الهجري">--</span>
                 </div>
             </div>
 
-            <!-- التوقيت السواحلي مع Tooltip الذكي -->
+            <!-- Solar time display section -->
             <section class="text-center w-full flex flex-col items-center mb-10 relative">
                 
-                <div class="flex items-baseline gap-3 mb-2 relative group cursor-help" aria-label="شرح التوقيت السواحلي">
+                <!-- Hour display with tooltip -->
+                <div class="flex items-baseline gap-3 mb-2 relative group cursor-help" aria-label="معلومات التوقيت السواحلي">
                     <span class="font-sans font-light text-5xl md:text-6xl text-theme-secondary">الساعة</span>
-                    <span class="font-mono font-light text-7xl md:text-8xl tracking-tighter text-theme-primary" id="hour-display" aria-live="polite">--</span>
-                    <!-- أيقونة الـ Tooltip -->
+                    <span class="font-mono font-light text-7xl md:text-8xl tracking-tighter text-theme-primary time-display" id="hour-display" aria-live="polite" aria-label="الساعة الحالية">--</span>
+                    
+                    <!-- Info icon -->
                     <div class="absolute -right-8 top-4 text-theme-secondary/50 group-hover:text-theme-primary transition-colors">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
                     </div>
-                    <!-- Tooltip Box -->
+                    
+                    <!-- Tooltip -->
                     <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 w-64 bg-theme-primary text-theme-surface text-xs p-4 rounded-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 shadow-xl z-50 pointer-events-none">
-                        التوقيت السواحلي يبدأ دائماً بـ "الساعة 1" عند شروق الشمس (أو غروبها). الدقيقة والساعة نسبيتان وتتغيران يومياً ليطابقا حركة الشمس الحقيقية في مدينتك.
+                        التوقيت السواحلي يبدأ دائماً بـ "الساعة 1" عند شروق الشمس. الدقيقة والساعة نسبيتان وتتغيران يومياً ليطابقا حركة الشمس الحقيقية.
                         <div class="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-theme-primary"></div>
                     </div>
                 </div>
 
-                <h2 class="font-sans text-xl text-theme-secondary mb-6 font-medium tracking-wide bg-theme-surface border border-theme-accent/30 px-5 py-1.5 rounded-full shadow-sm" id="phase-display" aria-live="polite">من --</h2>
+                <!-- Phase display -->
+                <h3 class="font-sans text-xl text-theme-secondary mb-6 font-medium tracking-wide bg-theme-surface border border-theme-accent/30 px-5 py-1.5 rounded-full shadow-sm" id="phase-display" aria-live="polite" aria-label="المرحلة الحالية">من --</h3>
                 
-                <div class="font-mono text-4xl font-semibold tracking-widest text-theme-primary drop-shadow-sm mb-4" id="metric-display" dir="ltr" aria-live="polite">--:--:--</div>
+                <!-- Metric display (HH:MM:SS) -->
+                <div class="font-mono text-4xl font-semibold tracking-widest text-theme-primary drop-shadow-sm mb-4 metric-display" id="metric-display" dir="ltr" aria-live="polite" aria-label="الوقت بالصيغة الدقيقة">--:--:--</div>
                 
-                <!-- العد التنازلي -->
+                <!-- Countdown to next event -->
                 <div class="text-xs font-bold text-theme-secondary tracking-widest uppercase bg-theme-accent/20 px-4 py-1.5 rounded-md" aria-live="polite">
-                    بقي على <span id="next-event-name" class="text-theme-primary">--</span>: 
-                    <span id="countdown-display" class="font-mono ml-1 text-theme-primary">--:--:--</span>
+                    بقي على <span id="next-event-name" class="text-theme-primary font-semibold">--</span>: 
+                    <span id="countdown-display" class="font-mono ml-1 text-theme-primary time-display">--:--:--</span>
                 </div>
             </section>
 
-            <!-- القوس الشمسي (تم إرجاع اتجاه الرسم 0 0 1 للأعلى) -->
+            <!-- Solar arc visualization -->
             <div class="relative w-full max-w-[320px] h-[170px] flex justify-center items-center mb-2" aria-hidden="true">
                 <svg viewBox="0 0 300 160" class="w-full h-full overflow-visible">
+                    <!-- Horizon line -->
                     <line x1="0" y1="140" x2="300" y2="140" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="6 6" class="opacity-50" />
-                    <!-- تم إعادة القوس للأعلى (sweep-flag = 1) -->
+                    
+                    <!-- Background arc -->
                     <path d="M 20 140 A 130 130 0 0 1 280 140" fill="none" stroke="var(--accent)" stroke-width="2" class="opacity-30"/>
+                    
+                    <!-- Progress arc -->
                     <path id="progress-arc" d="M 20 140 A 130 130 0 0 1 280 140" fill="none" stroke="var(--text-primary)" stroke-width="4" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100" class="transition-all duration-1000 ease-linear" stroke-linecap="round"/>
                     
-                    <!-- طبقة أوقات الصلاة -->
+                    <!-- Prayer time markers -->
                     <g id="prayer-markers" class="transition-opacity duration-500"></g>
 
+                    <!-- Celestial body (sun/moon) -->
                     <g id="celestial-body" class="transition-all duration-1000 ease-linear" transform="translate(20, 140)">
                         <circle id="sun-shape" cx="0" cy="0" r="8" fill="var(--surface)" stroke="var(--text-primary)" stroke-width="3.5" class="transition-opacity duration-1000 shadow-xl" />
                         <path id="moon-shape" d="M -2,-8 A 9,9 0 1,0 6,6 A 11,11 0 1,1 -2,-8 Z" fill="var(--text-primary)" class="transition-opacity duration-1000 opacity-0" />
@@ -125,7 +215,7 @@
                 </svg>
             </div>
 
-            <!-- شريط المقارنة -->
+            <!-- Day/Night comparison bar -->
             <div class="w-full max-w-[320px] flex flex-col gap-2 mb-10 px-2" aria-label="مقارنة طول الليل والنهار">
                 <div class="w-full h-1.5 rounded-full flex overflow-hidden opacity-90 shadow-inner bg-theme-accent/30">
                     <div id="day-bar" class="h-full bg-theme-dayBar transition-all duration-1000" style="width:50%"></div>
@@ -144,24 +234,25 @@
                 </div>
             </div>
 
-            <!-- الأوقات القياسية -->
+            <!-- Standard time footer -->
             <footer class="w-full flex items-center justify-between bg-theme-surface/60 rounded-2xl py-6 px-2 text-center border border-theme-accent/40 backdrop-blur-md">
                 <div class="flex-1 flex flex-col gap-2">
                     <span class="font-sans text-[0.7rem] font-bold text-theme-secondary uppercase tracking-widest">الشروق</span>
-                    <span class="font-mono text-sm text-theme-primary font-bold" id="sunrise-time">--:--</span>
+                    <span class="font-mono text-sm text-theme-primary font-bold time-display" id="sunrise-time">--:--</span>
                 </div>
                 <div class="flex-1 flex flex-col gap-2 border-x border-theme-accent/40">
                     <span class="font-sans text-[0.65rem] font-bold text-theme-secondary uppercase tracking-widest">التوقيت القياسي</span>
-                    <span class="font-mono text-lg font-extrabold text-theme-primary drop-shadow-sm" id="standard-time" dir="ltr" aria-live="polite">--:--:--</span>
+                    <span class="font-mono text-lg font-extrabold text-theme-primary drop-shadow-sm time-display" id="standard-time" dir="ltr" aria-live="polite" aria-label="التوقيت المحلي">--:--:--</span>
                 </div>
                 <div class="flex-1 flex flex-col gap-2">
                     <span class="font-sans text-[0.7rem] font-bold text-theme-secondary uppercase tracking-widest">الغروب</span>
-                    <span class="font-mono text-sm text-theme-primary font-bold" id="sunset-time">--:--</span>
+                    <span class="font-mono text-sm text-theme-primary font-bold time-display" id="sunset-time">--:--</span>
                 </div>
             </footer>
         </main>
     </div>
 
+    <!-- Application script -->
     <script src="js/app.js"></script>
 </body>
 </html>
