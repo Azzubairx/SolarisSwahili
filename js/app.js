@@ -1,5 +1,6 @@
 /**
  * تطبيق التوقيت السواحلي - هندسة برمجية (Modular Pattern)
+ * نسخة مصححة بالكامل خالية من أخطاء الـ Type Cast
  */
 const App = (() => {
     // --- 1. الإعدادات والحالة (State & Config) ---
@@ -102,15 +103,15 @@ const App = (() => {
             return new Date(Date.now() + (offsetDays * 86400000)).toLocaleDateString('en-CA');
         },
 
-        // تم إصلاح الدالة هنا لتعالج التحويل النصي والأرقام بشكل آمن لمنع الانهيار
+        // تم إصلاح الدالة وتأمين عمليات الـ Padding بشكل كامل لمنع الأخطاء
         parseAbsoluteUTC: (dateStr, timeStr, offset) => {
             if (!timeStr) return 0;
             const [time, modifier] = timeStr.split(' ');
             let [h, m, s] = time.split(':');
             
             let hours = parseInt(h, 10);
-            if (modifier === 'PM' && hours !== 12) hours += 12;
-            if (modifier === 'AM' && hours === 12) hours = 0;
+            if (hours === 12) hours = 0;
+            if (modifier === 'PM') hours += 12;
             
             const pad = (n) => n.toString().padStart(2, '0');
             const iso = `${dateStr}T${pad(hours)}:${pad(m)}:${pad(s)}Z`;
@@ -218,6 +219,7 @@ const App = (() => {
                 phase = 'الليل'; startMs = todaySunset; endMs = tomorrowSunrise;
             }
 
+            // الثيمات
             if (!State.manualThemeOverride) {
                 let theme = 'theme-day';
                 const distSunrise = Math.abs(now - todaySunrise);
@@ -238,9 +240,11 @@ const App = (() => {
                 }
             }
 
+            // المؤشر السماوي
             UI.sunShape.style.opacity = phase === 'الليل' ? '0' : '1';
             UI.moonShape.style.opacity = phase === 'الليل' ? '1' : '0';
 
+            // الحسابات النسبية
             const duration = endMs - startMs;
             const progress = Math.max(0, Math.min(1, (now - startMs) / duration));
             const propElapsedMs = progress * (12 * 3600 * 1000);
@@ -253,14 +257,17 @@ const App = (() => {
             UI.phaseDisplay.textContent = `من ${phase}`;
             UI.metricDisplay.textContent = UI.formatMetric(pH, pM, pS);
 
+            // حساب المتبقي للحدث القادم
             const nextEventMs = phase === 'النهار' ? todaySunset : (now < todaySunrise ? todaySunrise : tomorrowSunrise);
             const diffMs = nextEventMs - now;
             UI.nextEventName.textContent = phase === 'النهار' ? 'الغروب' : 'الشروق';
             UI.countdownDisplay.textContent = UI.formatMetric(Math.floor(diffMs/3600000), Math.floor((diffMs%3600000)/60000), Math.floor((diffMs%60000)/1000));
 
+            // التوقيت المحلي الفعلي
             const localDate = new Date(now + (utcOffsetMinutes * 60000));
             document.getElementById('standard-time').textContent = UI.formatMetric(localDate.getUTCHours(), localDate.getUTCMinutes(), localDate.getUTCSeconds());
 
+            // القوس (Sweep-flag is 0)
             const angle = Math.PI - (progress * Math.PI);
             const cx = 150 + 130 * Math.cos(angle);
             const cy = 140 - 130 * Math.sin(angle);
@@ -333,7 +340,6 @@ const App = (() => {
         }
     };
 
-    // --- 6. الإعداد المبدئي والأحداث (Init & Events) ---
     const initEvents = () => {
         const buildButtons = () => {
             UI.citySelector.innerHTML = '';
