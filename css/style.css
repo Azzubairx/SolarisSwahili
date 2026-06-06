@@ -1,305 +1,91 @@
-/* ================================================================
-   SolarisSwahili v2.0 — نظام التصميم الاحترافي
-   css/style.css
-   ================================================================ */
-
-/* ── 1. متغيرات الجذر: ثيم النهار الافتراضي ─────────────────── */
 :root {
-    /* السماء — يتحكم فيها JS كل ثانية */
-    --sky-top:       #F3F4F6;
-    --sky-bot:       #E5E7EB;
-
-    /* الأسطح */
-    --surface:       #FFFFFF;
-    --glass:         rgba(255, 255, 255, 0.60);
-    --glass-border:  rgba(0, 0, 0, 0.08);
-
-    /* النصوص */
-    --text-pri:      #111827;
-    --text-sec:      #4B5563;   /* تباين > 4.5:1 على الأبيض */
-
-    /* المساحد والتفاصيل */
-    --accent:        #9CA3AF;
-    --accent-faint:  rgba(156, 163, 175, 0.25);
-    --day-clr:       #D97706;   /* Amber 600 */
-    --night-clr:     #4338CA;   /* Indigo 700 */
-    --glow-sun:      rgba(251, 191, 36, 0.35);
-    --shadow:        rgba(0, 0, 0, 0.06);
+    /* المظهر النهاري الافتراضي (Day) - تباين عالي > 4.5:1 */
+    --bg-color: #F3F4F6;
+    --surface: #FFFFFF;
+    --text-primary: #111827;
+    --text-secondary: #4B5563; /* تم تغميقه للتباين */
+    --accent: #D1D5DB;
+    --day-bar: #D97706; /* Amber 600 */
+    --night-bar: #4338CA; /* Indigo 700 */
 }
 
-/* ── 2. ثيم الغسق / الفجر ────────────────────────────────────── */
 body.theme-golden {
-    --surface:       #FFFDF8;
-    --glass:         rgba(255, 253, 248, 0.65);
-    --glass-border:  rgba(161, 98, 7, 0.14);
-    --text-pri:      #451A03;
-    --text-sec:      #92400E;
-    --accent:        #CA8A04;
-    --accent-faint:  rgba(202, 138, 4, 0.18);
-    --day-clr:       #EA580C;
-    --night-clr:     #3730A3;
-    --glow-sun:      rgba(251, 146, 60, 0.45);
-    --shadow:        rgba(120, 53, 15, 0.08);
+    /* مظهر الفجر/الغسق (Golden Hour) */
+    --bg-color: #FDF6E3;
+    --surface: #FFFDF8;
+    --text-primary: #451A03; /* بني داكن */
+    --text-secondary: #78350F;
+    --accent: #E7E5E4;
+    --day-bar: #EA580C;
+    --night-bar: #3730A3;
 }
 
-/* ── 3. ثيم الليل ────────────────────────────────────────────── */
 body.theme-night {
-    --surface:       #1E293B;
-    --glass:         rgba(30, 41, 59, 0.70);
-    --glass-border:  rgba(255, 255, 255, 0.07);
-    --text-pri:      #F1F5F9;
-    --text-sec:      #94A3B8;
-    --accent:        #475569;
-    --accent-faint:  rgba(71, 85, 105, 0.30);
-    --day-clr:       #F59E0B;
-    --night-clr:     #818CF8;
-    --glow-sun:      rgba(165, 180, 252, 0.30);
-    --shadow:        rgba(0, 0, 0, 0.35);
+    /* المظهر الليلي (Night) - تباين عالي > 4.5:1 */
+    --bg-color: #0F172A;
+    --surface: #1E293B;
+    --text-primary: #F8FAFC;
+    --text-secondary: #94A3B8; /* رمادي فاتح */
+    --accent: #334155;
+    --day-bar: #F59E0B; /* Amber 500 */
+    --night-bar: #6366F1; /* Indigo 500 */
 }
 
-/* ── 4. الجسم ────────────────────────────────────────────────── */
 body {
-    background: linear-gradient(160deg, var(--sky-top) 0%, var(--sky-bot) 100%);
-    background-attachment: fixed;
-    color: var(--text-pri);
+    background-color: var(--bg-color);
+    color: var(--text-primary);
     overflow-x: hidden;
-    transition: color 1.5s ease;
 }
 
-/* ── 5. نمط الخلفية الطبوغرافي ───────────────────────────────── */
+/* الخريطة الطبوغرافية */
 body::before {
-    content: '';
+    content: "";
     position: fixed;
     inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 60 Q30 38,60 60 T120 60 M0 90 Q30 68,60 90 T120 90 M0 30 Q30 8,60 30 T120 30' fill='none' stroke='%23888' stroke-width='0.4' opacity='0.07'/%3E%3C/svg%3E");
-    background-size: 200px 200px;
+    background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 50 Q 25 30, 50 50 T 100 50 M 0 70 Q 25 50, 50 70 T 100 70 M 0 30 Q 25 10, 50 30 T 100 30' fill='none' stroke='%23888888' stroke-width='0.5' opacity='0.1'/%3E%3C/svg%3E");
+    background-size: 150px 150px;
     pointer-events: none;
     z-index: -2;
 }
-body.theme-night::before { opacity: 0.30; }
 
-/* ── 6. طبقة النجوم ──────────────────────────────────────────── */
-#stars-layer { animation: twinkle 7s infinite alternate ease-in-out; }
-@keyframes twinkle {
-    from { opacity: 0;    }
-    to   { opacity: 0.92; }
-}
-
-/* ── 7. Loader ───────────────────────────────────────────────── */
-#loader {
-    background: linear-gradient(160deg, var(--sky-top) 0%, var(--sky-bot) 100%);
-    transition: opacity 0.6s ease;
-}
-.loader-ring {
-    width: 42px; height: 42px;
-    border: 3px solid var(--accent-faint);
-    border-top-color: var(--text-pri);
-    border-radius: 50%;
-    animation: spin 0.85s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* ── 8. بطاقات الزجاج (Glassmorphism) ───────────────────────── */
-.card {
-    background: var(--glass);
-    border: 1px solid var(--glass-border);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
-}
-.card-deep {
-    background: var(--glass);
-    border: 1px solid var(--glass-border);
-    backdrop-filter: blur(28px);
-    -webkit-backdrop-filter: blur(28px);
-    box-shadow: 0 10px 50px var(--shadow);
-}
-
-/* ── 9. أزرار التحكم ─────────────────────────────────────────── */
-.ctrl-btn {
-    display: flex; align-items: center; justify-content: center;
-    width: 38px; height: 38px; border-radius: 50%;
-    background: var(--glass);
-    border: 1px solid var(--glass-border);
-    color: var(--text-pri);
-    cursor: pointer;
-    backdrop-filter: blur(16px);
-    box-shadow: 0 2px 10px var(--shadow);
-    transition: transform 0.18s ease, box-shadow 0.18s ease;
-}
-.ctrl-btn:hover  { transform: scale(1.1);  box-shadow: 0 4px 18px var(--shadow); }
-.ctrl-btn:active { transform: scale(0.94); }
-.ctrl-btn:focus-visible { outline: 2px solid var(--text-pri); outline-offset: 3px; }
-
-/* ── 10. أزرار المدن ─────────────────────────────────────────── */
+/* تنسيقات الأزرار مع تأثير تفاعلي (Accessibility & UX) */
 .city-btn {
     font-family: 'Tajawal', sans-serif;
-    font-size: 0.875rem;
-    padding: 0.3rem 1.1rem;
+    font-size: 0.95rem;
+    padding: 0.35rem 1.2rem;
     border-radius: 9999px;
-    color: var(--text-sec);
-    background: transparent;
-    border: 1px solid var(--glass-border);
+    color: var(--text-secondary);
+    background-color: var(--surface);
+    border: 1px solid var(--accent);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
-    transition: color 0.18s, background 0.18s, transform 0.18s, border-color 0.18s;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
+
 .city-btn:hover, .city-btn:focus-visible {
-    color: var(--text-pri);
-    background: var(--glass);
-    border-color: var(--accent);
-    transform: translateY(-1px);
+    color: var(--text-primary);
+    border-color: var(--text-secondary);
     outline: none;
+    transform: translateY(-1px);
 }
-.city-btn:active { transform: scale(0.97); }
+
 .city-btn.active {
     color: var(--surface);
-    background: var(--text-pri);
-    border-color: var(--text-pri);
-    font-weight: 800;
-    box-shadow: 0 2px 8px var(--shadow);
+    background-color: var(--text-primary);
+    border-color: var(--text-primary);
+    font-weight: 700;
     transform: translateY(0);
 }
 
-/* ── 11. حقل الإدخال وزر الإضافة ────────────────────────────── */
-.city-input {
-    background: var(--surface);
-    border: 1px solid var(--glass-border);
-    color: var(--text-pri);
-    transition: border-color 0.2s, box-shadow 0.2s;
-}
-.city-input::placeholder { color: var(--text-sec); opacity: 0.55; }
-.city-input:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px var(--accent-faint);
-    outline: none;
-}
-.add-btn {
-    background: var(--text-pri);
-    color: var(--surface);
-    border: none; cursor: pointer;
-    transition: opacity 0.18s, transform 0.18s;
-}
-.add-btn:hover  { opacity: 0.80; transform: translateY(-1px); }
-.add-btn:active { opacity: 1;    transform: scale(0.97); }
-.add-btn:disabled { opacity: 0.42; cursor: not-allowed; transform: none; }
-
-/* ── 12. الترويسة والعناوين ──────────────────────────────────── */
-.header-title { color: var(--text-pri); }
-.header-sub   { color: var(--text-sec); }
-.city-title   { color: var(--text-pri); }
-.hijri-label  { color: var(--text-sec); }
-
-/* ── 13. الساعة الكبيرة ──────────────────────────────────────── */
-.hour-word { color: var(--text-sec); }
-.hour-num  { color: var(--text-pri); line-height: 0.9; }
-
-/* ── 14. شارة الطور ──────────────────────────────────────────── */
-.phase-pill {
-    background: var(--glass);
-    border: 1px solid var(--glass-border);
-    color: var(--text-sec);
-    transition: all 0.6s ease;
-}
-
-/* ── 15. الرقم التفصيلي النسبي ───────────────────────────────── */
-.metric-num { color: var(--text-pri); letter-spacing: 0.06em; }
-
-/* ── 16. Tooltip ─────────────────────────────────────────────── */
-.tip-box {
-    background: var(--text-pri);
-    color: var(--surface);
-    line-height: 1.65;
-    box-shadow: 0 8px 32px var(--shadow);
-}
-.tip-arrow { border-top-color: var(--text-pri); }
-.tip-icon  { color: var(--text-sec); }
-
-/* ── 17. العداد التنازلي ─────────────────────────────────────── */
-.cd-wrap {
-    background: var(--accent-faint);
-    border: 1px solid var(--glass-border);
-    color: var(--text-sec);
-}
-.cd-dot   { background: var(--day-clr); }
-.cd-event { color: var(--text-pri); font-weight: 700; }
-.cd-num   { color: var(--text-pri); }
-body.theme-night .cd-dot { background: var(--night-clr); }
-
-/* ── 18. مؤشرات الصلاة على القوس ────────────────────────────── */
-.prayer-dot {
+/* نقطة الصلاة على القوس */
+.prayer-marker {
     fill: var(--surface);
-    stroke: var(--text-sec);
-    stroke-width: 1.5;
+    stroke: var(--text-secondary);
+    stroke-width: 2;
+    transition: all 0.3s;
     cursor: help;
-    transition: r 0.2s ease, fill 0.2s ease;
 }
-.prayer-dot:hover   { fill: var(--text-pri); }
-.prayer-dot-next    { stroke: #F59E0B; stroke-width: 2.5; }
-
-@keyframes pulse-ring {
-    0%   { r: 5;  opacity: 0.85; }
-    100% { r: 16; opacity: 0;    }
+.prayer-marker:hover {
+    fill: var(--text-primary);
+    r: 6;
 }
-.prayer-pulse {
-    fill: none;
-    stroke: #F59E0B;
-    stroke-width: 1.5;
-    animation: pulse-ring 2.4s ease-out infinite;
-}
-
-/* ── 19. الجسم السماوي والقوس ───────────────────────────────── */
-#progress-arc    { transition: stroke-dashoffset 0.95s linear; }
-#celestial-body  { transition: transform 0.95s linear; }
-#sun-shape,
-#moon-shape      { transition: opacity 2s ease; }
-
-@keyframes halo-breathe {
-    from { opacity: 0.10; r: 11; }
-    to   { opacity: 0.30; r: 20; }
-}
-#sun-halo { animation: halo-breathe 4.5s ease-in-out infinite alternate; }
-
-/* ── 20. شريط النهار والليل ──────────────────────────────────── */
-.dl-bg    { background: var(--accent-faint); }
-.dl-day   { background: var(--day-clr);   transition: width 2s ease; }
-.dl-night { background: var(--night-clr); transition: width 2s ease; }
-
-.dl-day-lbl   { color: var(--day-clr); }
-.dl-night-lbl { color: var(--night-clr); }
-.dl-sec       { color: var(--text-sec); }
-.dl-badge {
-    background: var(--glass);
-    border: 1px solid var(--glass-border);
-    color: var(--text-pri);
-    white-space: nowrap;
-}
-
-/* ── 21. شريط أوقات الصلاة ───────────────────────────────────── */
-.prayer-bar {
-    background: var(--surface);
-    border: 1px solid var(--glass-border);
-}
-.prayer-item { transition: background 0.15s; border-radius: 0.5rem; }
-.prayer-item:hover { background: var(--accent-faint); }
-.p-name { color: var(--text-sec); font-size: 0.58rem; font-weight: 700; letter-spacing: 0.04em; }
-.p-time { color: var(--text-pri); font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; font-weight: 600; }
-.prayer-item-next .p-name,
-.prayer-item-next .p-time { color: #F59E0B; }
-
-/* ── 22. التذييل ─────────────────────────────────────────────── */
-.footer-card  { background: var(--surface); border: 1px solid var(--glass-border); }
-.footer-lbl   { color: var(--text-sec); }
-.footer-val   { color: var(--text-pri); }
-
-/* ── 23. واجهة الخطأ ─────────────────────────────────────────── */
-.err-backdrop { background: rgba(7, 0, 20, 0.88); }
-.err-card     { background: rgba(20, 5, 30, 0.92); border: 1px solid rgba(239, 68, 68, 0.20); }
-.err-icon-bg  { background: rgba(239, 68, 68, 0.14); }
-.err-icon     { color: #FCA5A5; }
-.err-title    { color: #FEF2F2; }
-.err-body     { color: #FECACA; }
-.retry-btn    { background: #FEF2F2; color: #4B0000; font-weight: 800; cursor: pointer; transition: background 0.15s; }
-.retry-btn:hover { background: #ffffff; }
-
-/* ── 24. خطأ الإدخال ─────────────────────────────────────────── */
-.input-err { color: #EF4444; }
-body.theme-night .input-err { color: #F87171; }
