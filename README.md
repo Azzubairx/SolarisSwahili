@@ -1,340 +1,102 @@
-<!-- markdownlint-disable -->
-# SolarisSwahili — Dynamic Swahili Time System
+# SolarisSwahili — Dynamic Swahili Time System for Libya
 
-*Professional Astronomical Time Display for Libyan Cities*
+SolarisSwahili is a lightweight single-page web application that calculates and displays the dynamic Swahili time based on the user's geographical location and the real movement of the sun, specifically sunrise and sunset. The application is designed to provide a clean, responsive, and modern interface that works directly in the browser without any build step or dependency installation.
 
-[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen?style=for-the-badge)](https://azzubairx.github.io/SolarisSwahili/)
-[![Responsive](https://img.shields.io/badge/Responsive-Yes-blue?style=for-the-badge)](https://azzubairx.github.io/SolarisSwahili/)
-[![Accessibility](https://img.shields.io/badge/WCAG%202.1-AA-green?style=for-the-badge)](https://www.w3.org/WAI/WCAG21/quickref/)
+The project currently supports major Libyan cities and is structured for easy extension.
 
-## 🌍 Overview
+## Live Demo
 
-**SolarisSwahili** is a sophisticated single-page web application that calculates and displays the **dynamic Swahili time** based on the user's geographical location and the **real movement of the sun**. Specifically designed for Libyan cities, it presents astronomical data in an intuitive, visually beautiful interface with professional interaction patterns.
+[Open the live website](https://azzubairx.github.io/SolarisSwahili/)
 
-The Swahili time system is an ancient timekeeping method where:
-- **Day begins at sunrise** (counted as hour 1)
-- **Night begins at sunset** (counted as hour 1)
-- Each period is divided into **12 proportional hours**
-- Time is relative to solar position, not fixed 24-hour cycles
+## Features
 
-## ✨ Key Features
+- Dynamic Swahili time calculation based on actual sunrise and sunset times.
+- Relative time logic that divides both day and night into 12 proportional hours.
+- Automatic theme switching based on the current solar state.
+- Responsive and modern user interface.
+- Live time and astronomical data updates.
+- Support for multiple Libyan cities.
+- Easy expansion for additional cities.
+- Zero-build setup with no external installation required.
 
-### 🎯 Core Functionality
-- ✅ **Real-time Swahili time calculation** based on live astronomical data
-- ✅ **Dual time display**: Swahili system + Standard (24-hour) clock
-- ✅ **Prayer times integration** displayed on visual arc
-- ✅ **Day/Night length comparison** with dynamic visualization
-- ✅ **Multi-city support** with dynamic city search
-- ✅ **Hijri calendar integration** (Islamic lunar dates)
-- ✅ **Countdown timer** to next solar event (sunrise/sunset)
+## Project Structure
 
-### 🎨 Design & UX
-- ✅ **Professional dark/light/golden themes** with automatic switching
-- ✅ **Smooth animations** and micro-interactions
-- ✅ **Responsive design** (mobile, tablet, desktop)
-- ✅ **Visual solar arc** showing sun/moon position
-- ✅ **Performance-optimized** (zero-dependency, lightweight)
-- ✅ **Accessible UI** (WCAG 2.1 AA compliant)
-
-### 🔧 Technical Excellence
-- ✅ **Modular architecture** (self-contained IIFE pattern)
-- ✅ **Error handling** with timeout management
-- ✅ **Smart caching** (6-hour TTL localStorage)
-- ✅ **API request optimization** (parallel fetches)
-- ✅ **Keyboard navigation** fully supported
-- ✅ **Screen reader friendly** (ARIA labels, live regions)
-
-## 🚀 Live Demo
-
-[**🔗 Open SolarisSwahili Now**](https://azzubairx.github.io/SolarisSwahili/)
-
-Experience the Swahili time system in real-time with automatic theme switching based on solar position.
-
-## 📦 Technologies Used
-
-| Technology | Purpose |
-|-----------|---------|
-| **HTML5** | Semantic structure & accessibility |
-| **CSS3** | Advanced design patterns, animations, responsive layouts |
-| **Vanilla JavaScript** | Core logic, API integration, DOM manipulation |
-| **Tailwind CSS** | Utility-first styling via CDN |
-| **REST APIs** | Real-time astronomical & prayer time data |
-
-### External APIs
-- **[sunrisesunset.io](https://api.sunrisesunset.io)** - Sunrise/sunset times
-- **[aladhan.com](https://aladhan.com)** - Prayer times (Islamic calendar)
-- **[openstreetmap.org (Nominatim)](https://nominatim.openstreetmap.org)** - City geolocation
-
-## 🏗️ Project Structure
-
-```
+```text
 SolarisSwahili/
-├── index.html           # Semantic HTML with professional structure
+├── index.html        # Main application structure
 ├── css/
-│   └── style.css        # Design system, themes, accessibility
-├── js/
-│   └── app.js           # Core logic, modular architecture
-└── README.md            # This file
-```
+│   └── style.css     # Theme variables, transitions, and custom styling
+└── js/
+    └── app.js        # Core logic, relative time calculations, and API integration
+````
 
-### Architecture Highlights
+## How It Works
 
-```javascript
-// Modular Pattern with clear separation of concerns
-const App = (() => {
-    // CONFIG - Application constants
-    // STATE - Centralized state management
-    // UI - DOM cache & utilities
-    // STORAGE - LocalStorage wrapper with TTL
-    // API - External API calls with error handling
-    // CORE - Business logic & astronomical calculations
-})();
-```
+The application relies on real astronomical data to determine:
 
-## 🔍 How It Works
+* Sunrise time
+* Sunset time
+* The current solar state
 
-### Step 1: Fetch Astronomical Data
-The app retrieves **sunrise and sunset times** for 3 days (yesterday, today, tomorrow) to ensure accurate transitions between day/night phases.
+Using this data, the app:
 
-### Step 2: Calculate Relative Time
-```javascript
-// Swahili time calculation
-const progress = (currentTime - phaseStart) / (phaseEnd - phaseStart);
-const swahiliHour = Math.floor(progress * 12) + 1; // 1-12
-```
+1. Calculates the length of the day and night.
+2. Divides each period into 12 relative hours.
+3. Displays a dynamic Swahili time system that changes according to the sun's actual position.
 
-### Step 3: Real-time Updates
-Every second, the display updates showing:
-- Current Swahili hour
-- Current phase (day/night)
-- Metric time (HH:MM:SS)
-- Countdown to next event
-- Arc position of sun/moon
+## Automatic Theme System
 
-### Step 4: Visual Feedback
-- **Automatic theme switching** based on solar state (day/golden hour/night)
-- **Prayer markers** displayed on the arc
-- **Day/night length comparison** with real-time bars
-- **Smooth animations** during all state transitions
+The theme engine works automatically based on the sun's position in the selected city.
 
-## 🎯 Supported Cities
+* During daylight hours, the light theme is enabled.
+* After sunset and before sunrise, the application applies the `.theme-night` class to the `<body>` element to activate the dark theme smoothly.
 
-| City | Coordinates | Region |
-|------|------------|--------|
-| 🏙️ **Tripoli** | 32.8892°N, 13.1900°E | Northwest (Capital) |
-| 🏖️ **Benghazi** | 32.1167°N, 20.0667°E | Northeast (Coast) |
-| 🌊 **Tobruk** | 32.0773°N, 23.9600°E | Far East (Border) |
-| ➕ **Any City** | Dynamic search | Global support |
+## Setup
 
-### Add Custom Cities
-Use the search bar to add any city worldwide! The app:
-1. Searches via OpenStreetMap Nominatim
-2. Fetches coordinates
-3. Calculates Swahili time automatically
-4. Persists in localStorage
+No build tools or package installation are required.
 
-## 🎨 Theme System
+### Run Locally
 
-The app intelligently switches between **3 aesthetic themes**:
-
-### 🌞 Day Theme (Light)
-- High contrast, energetic colors
-- Optimized for bright daylight
-- Amber/Indigo accents
-
-### 🌅 Golden Hour Theme (Twilight)
-- Warm, inviting color palette
-- Displayed 45 minutes around sunrise/sunset
-- Cream backgrounds, brown text
-
-### 🌙 Night Theme (Dark)
-- Deep, comfortable colors for eyes
-- WCAG 2.1 AA compliant contrast
-- Animated starfield background
-
-All transitions are **smooth (1.5s ease-in-out)** for visual comfort.
-
-## 📱 Responsive Design
-
-| Device | Experience |
-|--------|------------|
-| **Mobile** (< 640px) | Stack layout, touch-friendly buttons |
-| **Tablet** (640-1024px) | Optimized grid, readable fonts |
-| **Desktop** (> 1024px) | Full-featured, max 1280px width |
-
-## ♿ Accessibility Features
-
-### WCAG 2.1 Level AA Compliance
-- ✅ **Color contrast** ≥ 4.5:1 for normal text
-- ✅ **Keyboard navigation** fully functional (Tab, Enter, Escape)
-- ✅ **Focus indicators** clearly visible
-- ✅ **ARIA labels** on all interactive elements
-- ✅ **Live regions** for real-time updates (aria-live)
-- ✅ **Screen reader support** with proper semantics
-- ✅ **Reduced motion** support (respects prefers-reduced-motion)
-
-### Example: Keyboard Navigation
-```
-Tab       - Move between city buttons and inputs
-Enter     - Select city or submit form
-Space     - Activate buttons (alternative)
-Escape    - Close overlays
-```
-
-## ⚡ Performance Optimizations
-
-| Optimization | Benefit |
-|--------------|---------|
-| **localStorage Caching (6h TTL)** | 90% reduction in API calls |
-| **Parallel API fetches** | 3 endpoints resolved simultaneously |
-| **AbortController timeouts** | Graceful failure at 8 seconds |
-| **Interval cleanup** | No memory leaks on city switch |
-| **DOM caching** | Single getElementById per element |
-| **CSS animations** | GPU-accelerated transforms |
-
-### Caching Strategy
-```javascript
-// Check cache first (6 hours)
-const cached = Storage.get(`solar_${lat}_${lng}_${date}`);
-if (cached) return cached; // No API call!
-
-// Otherwise fetch & cache
-const data = await API.fetchSolar(lat, lng);
-Storage.set(cacheKey, data);
-```
-
-## 🔐 Error Handling
-
-The app includes **comprehensive error management**:
-
-```javascript
-// Network timeout (8 seconds)
-fetchWithTimeout(url, 8000)
-
-// API response validation
-if (response.code !== 200) throw new Error(...)
-
-// User-friendly error messages
-showError("خطأ في جلب بيانات الشمس");
-
-// Retry mechanism with visual feedback
-```
-
-## 🚀 Setup & Deployment
-
-### Local Development
-No build tools required! Pure HTML/CSS/JS.
+1. Clone the repository:
 
 ```bash
-# Clone repository
-git clone https://github.com/Azzubairx/SolarisSwahili.git
-
-# Open in browser
-open SolarisSwahili/index.html
-
-# Or use a local server
-python -m http.server 8000
-# Visit http://localhost:8000
+git clone https://github.com/AzzubairX/SolarisSwahili.git
 ```
 
-### GitHub Pages Deployment
-✅ **Already live at:** https://azzubairx.github.io/SolarisSwahili/
+2. Open `index.html` in any modern browser.
 
-The app auto-deploys from the `main` branch via GitHub Actions.
+## Technologies Used
 
-## 🎓 Learning Resources
+* HTML5
+* CSS3
+* Vanilla JavaScript
+* Tailwind CSS via CDN
+* Astronomical time APIs
 
-### Understanding Swahili Time
-- [Wikipedia: Swahili Time](https://en.wikipedia.org/wiki/Swahili_people)
-- [Islamic Calendar System](https://en.wikipedia.org/wiki/Hijri_calendar)
+## Supported Cities
 
-### Technical Concepts Used
-- **Astronomical calculations**: Solar arc, sunrise/sunset math
-- **API integration**: Fetch, error handling, timeouts
-- **DOM manipulation**: Real-time updates, smooth transitions
-- **Web performance**: Caching strategies, lazy loading
+Currently, the application supports:
 
-## 📊 Code Statistics
+* Tobruk
+* Benghazi
+* Tripoli
 
-```
-HTML:       ~21 KB (well-structured, semantic)
-CSS:        ~8.8 KB (organized, commented)
-JavaScript: ~25 KB (modular, documented)
-Total:      ~55 KB (uncompressed)
-```
+Additional cities can be added easily in future updates.
 
-**Zero dependencies** — Everything works standalone!
+## Design Principles
 
-## 🎯 Design Principles
+This project is built to be:
 
-This project embodies three core principles:
+* Fast and lightweight
+* Easy to understand and maintain
+* Independent of complex frameworks
+* Based on real astronomical timing data
 
-### 1️⃣ Psychological Comfort
-- Smooth transitions ease cognitive load
-- Color schemes chosen for eye comfort
-- Information hierarchy prioritizes clarity
-- Animations provide satisfying feedback
+## License
 
-### 2️⃣ Visual Harmony
-- Consistent spacing & typography
-- Color palette respects accessibility
-- Light/dark modes both beautiful
-- Professional, modern aesthetic
-
-### 3️⃣ Interactive Delight
-- Micro-interactions on hover/focus
-- Instant visual feedback on actions
-- Smooth animations (never jarring)
-- Playful without being unprofessional
-
-## 🔄 Future Enhancements
-
-Potential features for v2.0:
-
-- 📍 User location auto-detection
-- 🌍 More Arab cities
-- 📊 Historical data charts
-- 🔔 Notifications for prayer times
-- 📖 Detailed documentation about Swahili time
-- 🌐 Multiple latuta.iosupport
-- 📦 Progressive Web App (PWA)
-- 🎨 Custom theme creator
-
-## 📝 License
-
-```
 Copyright © 2026 Azzubair
+
 All rights reserved.
+
 ```
-
-## 👤 Author
-
-**Azzubair**
-- GitHub: [@Azzubairx](https://github.com/Azzubairx)
-- Email: [azzubair@tuta.io](mailto:azzubair@tuta.io)
-
-## 🙏 Acknowledgments
-
-- **sunrisesunset.io** - Astronomical data
-- **aladhan.com** - Prayer times API
-- **OpenStreetMap Nominatim** - Geolocation
-- **Tailwind CSS** - Utility framework
-- **Web standards community**Bwost practices & acp
-## 🤝 Contributing
-
-Found a bug or have a suggestion? Please open an issue on GitHub!
-
-```bash
-# Issues URL
-https://github.com/Azzubairx/SolarisSwahili/issues
 ```
-
----
-
-<div align="center">
-
-**Made with ❤️ in Libya**
-
-*Celebrating timeless traditions through modern technology*
-
-</div>
