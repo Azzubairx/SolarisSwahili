@@ -22,7 +22,6 @@
             pointer-events:none;
             white-space:nowrap;
             transform:translate(-50%,-120%);
-            /* ✅ مشكلة 12 — z-index عبر متغير CSS */
             z-index: var(--z-content, 10);
         }
     </style>
@@ -33,12 +32,10 @@
     <script src="js/theme.js"></script>
 
     <nav class="site-nav">
-        <!-- ✅ Issue 20 — شعار SVG -->
         <a href="index.html" class="nav-logo" aria-label="SolarisSwahili — الصفحة الرئيسية">
             <img src="assets/logo.svg" alt="SolarisSwahili" height="28">
         </a>
         <div class="nav-links">
-            <!-- ✅ Bug 2 — data-i18n على جميع روابط التنقل -->
             <a href="index.html"     class="nav-link"        data-i18n="navHome">الرئيسية</a>
             <a href="about.html"     class="nav-link"        data-i18n="navAbout">عن المشروع</a>
             <a href="compare.html"   class="nav-link"        data-i18n="navCompare">مقارنة</a>
@@ -86,10 +83,10 @@
             </div>
             <div class="dash-card">
                 <div class="chart-container" style="position:relative;">
-                    <!-- ✅ Bug 22 — إضافة role وaria-label وaria-describedby للـ Canvas -->
+                    <!-- ✅ A4 — aria-label يُحدَّث برمجياً عند تغيير المدينة -->
                     <canvas id="day-length-chart"
                             role="img"
-                            aria-label="مخطط يُظهر تغير طول النهار على مدار السنة"
+                            aria-label="مخطط طول النهار السنوي لمدينة طبرق"
                             aria-describedby="chart-desc"
                             style="width:100%;display:block;cursor:crosshair;"></canvas>
                     <p id="chart-desc" class="sr-only">
@@ -170,17 +167,14 @@
 
     </div><!-- /page-container -->
 
-    <!-- ✅ Bug 2 — تحميل نظام الترجمة المشترك -->
     <script src="js/i18n.js"></script>
     <script>
     /* ══════════════════════════════════════════════════════
        Solar Astronomy Math (no API required)
     ══════════════════════════════════════════════════════ */
 
-    /* ✅ Bug 2 — isEn مأخوذ من SubI18N */
     let isEn = SubI18N.getLang() === 'en';
 
-    /* ✅ Bug 2 — toggleLang يفوّض إلى SubI18N */
     function toggleLang() {
         SubI18N.toggle();
         isEn = SubI18N.getLang() === 'en';
@@ -199,7 +193,11 @@
         return (2 * H / Math.PI * 12 * 60);
     }
 
+    /* ✅ P4 — تخزين مؤقت لنتائج yearData لتجنب إعادة الحساب عند اختيار نفس المدينة */
+    const _ydCache = new Map();
+
     function yearData(lat) {
+        if (_ydCache.has(lat)) return _ydCache.get(lat);
         const data = [];
         for (let d = 1; d <= 365; d++) {
             const dayMin = daylightMinutes(lat, d);
@@ -210,6 +208,7 @@
                 swahiliHourMin: dayMin / 12
             });
         }
+        _ydCache.set(lat, data);
         return data;
     }
 
@@ -237,7 +236,7 @@
     }
 
     let currentLat = 32.0773;
-    let currentCityName = isEn ? 'Tobruk' : 'طبرق';
+    let currentCityName = 'طبرق';
 
     function selectCity(btn, name, lat) {
         document.querySelectorAll('.dash-city-picker .city-btn').forEach(b => b.classList.remove('active'));
@@ -253,7 +252,6 @@
 
     function drawDayLengthChart(data) {
         const canvas = document.getElementById('day-length-chart');
-        /* DPI fix already present in original */
         const dpr = window.devicePixelRatio || 1;
         const W = canvas.parentElement.clientWidth || 700;
         const H = Math.max(200, Math.min(280, W * 0.38));
@@ -363,6 +361,11 @@
         canvas._chartData = data;
         canvas._chartPad  = PAD;
         canvas._chartSize = { cW, cH, W, H };
+
+        /* ✅ A4 — تحديث aria-label بالمدينة الحالية */
+        canvas.setAttribute('aria-label',
+            (isEn ? 'Annual daylight chart for ' : 'مخطط طول النهار السنوي لمدينة ') + currentCityName
+        );
     }
 
     function drawHourDiffChart(data) {
@@ -504,7 +507,7 @@
 
         document.getElementById('month-tbody').innerHTML = rows;
 
-        /* ✅ Bug 17 — تحديث رؤوس الجدول بناءً على اللغة المحفوظة */
+        /* تحديث رؤوس الجدول بناءً على اللغة */
         const th = document.querySelectorAll('#month-table th');
         const headers = isEn
             ? ['Month','Daylight (avg)','Swahili Hour','vs 60min','Longest Day','Shortest Day']
@@ -587,11 +590,16 @@
     /* تحميل أولي */
     renderAll();
 
+    /* ✅ P3 — تأخير إعادة الرسم عند تغيير حجم النافذة لتجنب الحسابات الزائدة */
+    let _resizeTimer;
     window.addEventListener('resize', () => {
-        const data = yearData(currentLat);
-        drawDayLengthChart(data);
-        drawHourDiffChart(data);
-        setupChartHover(data);
+        clearTimeout(_resizeTimer);
+        _resizeTimer = setTimeout(() => {
+            const data = yearData(currentLat);
+            drawDayLengthChart(data);
+            drawHourDiffChart(data);
+            setupChartHover(data);
+        }, 150);
     });
     </script>
 </body>
