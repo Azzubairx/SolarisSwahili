@@ -22,19 +22,27 @@
             pointer-events:none;
             white-space:nowrap;
             transform:translate(-50%,-120%);
-            z-index:10;
+            /* ✅ مشكلة 12 — z-index عبر متغير CSS */
+            z-index: var(--z-content, 10);
         }
     </style>
 </head>
 <body class="antialiased min-h-screen">
 
+    <!-- ✅ Bug 3 — تطبيق الثيم المحفوظ مبكراً -->
+    <script src="js/theme.js"></script>
+
     <nav class="site-nav">
-        <a href="index.html" class="nav-logo">SolarisSwahili</a>
+        <!-- ✅ Issue 20 — شعار SVG -->
+        <a href="index.html" class="nav-logo" aria-label="SolarisSwahili — الصفحة الرئيسية">
+            <img src="assets/logo.svg" alt="SolarisSwahili" height="28">
+        </a>
         <div class="nav-links">
-            <a href="index.html" class="nav-link">الرئيسية</a>
-            <a href="about.html" class="nav-link">عن المشروع</a>
-            <a href="compare.html" class="nav-link">مقارنة</a>
-            <a href="dashboard.html" class="nav-link active">إحصائيات</a>
+            <!-- ✅ Bug 2 — data-i18n على جميع روابط التنقل -->
+            <a href="index.html"     class="nav-link"        data-i18n="navHome">الرئيسية</a>
+            <a href="about.html"     class="nav-link"        data-i18n="navAbout">عن المشروع</a>
+            <a href="compare.html"   class="nav-link"        data-i18n="navCompare">مقارنة</a>
+            <a href="dashboard.html" class="nav-link active" data-i18n="navDashboard">إحصائيات</a>
         </div>
         <div class="nav-right">
             <button id="lang-toggle" class="lang-btn" onclick="toggleLang()">EN</button>
@@ -57,19 +65,17 @@
         <!-- City picker -->
         <div class="dash-city-picker">
             <span class="text-xs font-bold tracking-wider" style="color:var(--text-sec);align-self:center;">المدينة:</span>
-            <button class="city-btn text-xs active" onclick="selectCity(this,'Tobruk',32.0773)" data-city="Tobruk">طبرق</button>
-            <button class="city-btn text-xs" onclick="selectCity(this,'Benghazi',32.1167)" data-city="Benghazi">بنغازي</button>
-            <button class="city-btn text-xs" onclick="selectCity(this,'Tripoli',32.8892)" data-city="Tripoli">طرابلس</button>
-            <button class="city-btn text-xs" onclick="selectCity(this,'Cairo',30.0444)" data-city="Cairo">القاهرة</button>
-            <button class="city-btn text-xs" onclick="selectCity(this,'Riyadh',24.6877)" data-city="Riyadh">الرياض</button>
-            <button class="city-btn text-xs" onclick="selectCity(this,'London',51.5074)" data-city="London">لندن</button>
+            <button class="city-btn text-xs active" onclick="selectCity(this,'Tobruk',32.0773,23.9600)" data-city="Tobruk">طبرق</button>
+            <button class="city-btn text-xs" onclick="selectCity(this,'Benghazi',32.1167,20.0667)" data-city="Benghazi">بنغازي</button>
+            <button class="city-btn text-xs" onclick="selectCity(this,'Tripoli',32.8892,13.1900)" data-city="Tripoli">طرابلس</button>
+            <button class="city-btn text-xs" onclick="selectCity(this,'Cairo',30.0444,31.2357)" data-city="Cairo">القاهرة</button>
+            <button class="city-btn text-xs" onclick="selectCity(this,'Riyadh',24.6877,46.7219)" data-city="Riyadh">الرياض</button>
+            <button class="city-btn text-xs" onclick="selectCity(this,'London',51.5074,-0.1278)" data-city="London">لندن</button>
         </div>
 
         <!-- Key stats row -->
         <div class="dash-section">
-            <div class="dash-stats-grid" id="stats-grid">
-                <!-- Populated by JS -->
-            </div>
+            <div class="dash-stats-grid" id="stats-grid"></div>
         </div>
 
         <!-- Day Length Chart -->
@@ -80,7 +86,16 @@
             </div>
             <div class="dash-card">
                 <div class="chart-container" style="position:relative;">
-                    <canvas id="day-length-chart" style="width:100%;display:block;cursor:crosshair;"></canvas>
+                    <!-- ✅ Bug 22 — إضافة role وaria-label وaria-describedby للـ Canvas -->
+                    <canvas id="day-length-chart"
+                            role="img"
+                            aria-label="مخطط يُظهر تغير طول النهار على مدار السنة"
+                            aria-describedby="chart-desc"
+                            style="width:100%;display:block;cursor:crosshair;"></canvas>
+                    <p id="chart-desc" class="sr-only">
+                        يعرض هذا المخطط مدة النهار بالدقائق لكل يوم من أيام السنة.
+                        أطول يوم في يونيو عند خطوط العرض الشمالية، وأقصر يوم في ديسمبر.
+                    </p>
                     <div id="chart-tooltip" class="tooltip-dot" style="display:none;"></div>
                 </div>
                 <div style="display:flex;justify-content:center;gap:1.5rem;margin-top:0.75rem;font-size:0.65rem;color:var(--text-sec);">
@@ -105,7 +120,10 @@
             </div>
             <div class="dash-card">
                 <div class="chart-container">
-                    <canvas id="hour-diff-chart" style="width:100%;display:block;"></canvas>
+                    <canvas id="hour-diff-chart"
+                            role="img"
+                            aria-label="مخطط يقارن مدة الساعة السواحلية بالساعة القياسية (60 دقيقة) على مدار السنة"
+                            style="width:100%;display:block;"></canvas>
                 </div>
                 <p style="font-size:0.7rem;color:var(--text-sec);text-align:center;margin-top:0.6rem;opacity:0.7;">
                     القيم فوق 60 دقيقة = الساعة السواحلية أطول من المدنية | أدناه = أقصر
@@ -152,47 +170,35 @@
 
     </div><!-- /page-container -->
 
+    <!-- ✅ Bug 2 — تحميل نظام الترجمة المشترك -->
+    <script src="js/i18n.js"></script>
     <script>
     /* ══════════════════════════════════════════════════════
        Solar Astronomy Math (no API required)
     ══════════════════════════════════════════════════════ */
-    let isEn = false;
-    const savedLang = localStorage.getItem('ss_lang') || 'ar';
-    if (savedLang === 'en') {
-        document.documentElement.lang = 'en';
-        document.documentElement.dir  = 'ltr';
-        document.getElementById('lang-toggle').textContent = 'عر';
-        isEn = true;
-    }
 
+    /* ✅ Bug 2 — isEn مأخوذ من SubI18N */
+    let isEn = SubI18N.getLang() === 'en';
+
+    /* ✅ Bug 2 — toggleLang يفوّض إلى SubI18N */
     function toggleLang() {
-        const wasAr = document.documentElement.lang !== 'en';
-        document.documentElement.lang = wasAr ? 'en' : 'ar';
-        document.documentElement.dir  = wasAr ? 'ltr' : 'rtl';
-        document.getElementById('lang-toggle').textContent = wasAr ? 'عر' : 'EN';
-        localStorage.setItem('ss_lang', wasAr ? 'en' : 'ar');
-        isEn = wasAr;
-        renderAll(); // re-render all charts and tables in new language
+        SubI18N.toggle();
+        isEn = SubI18N.getLang() === 'en';
+        renderAll();
     }
-
-    const h = new Date().getHours();
-    if (h>=20||h<5) document.body.classList.add('theme-night');
-    else if ((h>=5&&h<7)||(h>=18&&h<20)) document.body.classList.add('theme-golden');
 
     const DEG = Math.PI / 180;
 
-    /** دقائق ضوء النهار لخط عرض (lat) واليوم (doy 1-365) */
     function daylightMinutes(lat, doy) {
         const decl = -23.45 * Math.cos(2 * Math.PI / 365 * (doy + 10)) * DEG;
         const latR  = lat * DEG;
         const cosH  = -Math.tan(latR) * Math.tan(decl);
-        if (cosH >= 1)  return 0;    // قطب شمالي — ليل قطبي
-        if (cosH <= -1) return 1440; // شمس منتصف الليل
+        if (cosH >= 1)  return 0;
+        if (cosH <= -1) return 1440;
         const H = Math.acos(cosH);
-        return (2 * H / Math.PI * 12 * 60); // دقيقة
+        return (2 * H / Math.PI * 12 * 60);
     }
 
-    /** إنتاج بيانات سنة كاملة (365 يوم) */
     function yearData(lat) {
         const data = [];
         for (let d = 1; d <= 365; d++) {
@@ -201,13 +207,12 @@
                 doy: d,
                 dayMin: dayMin,
                 nightMin: 1440 - dayMin,
-                swahiliHourMin: dayMin / 12  // مدة ساعة سواحلية واحدة بالدقائق
+                swahiliHourMin: dayMin / 12
             });
         }
         return data;
     }
 
-    /** اليوم الحالي من السنة */
     function currentDOY() {
         const now = new Date();
         const start = new Date(now.getFullYear(), 0, 0);
@@ -242,13 +247,13 @@
         renderAll();
     }
 
-    /* ── Canvas Charts ────────────────────────────────── */
     function getCSS(v) {
         return getComputedStyle(document.documentElement).getPropertyValue(v).trim();
     }
 
     function drawDayLengthChart(data) {
         const canvas = document.getElementById('day-length-chart');
+        /* DPI fix already present in original */
         const dpr = window.devicePixelRatio || 1;
         const W = canvas.parentElement.clientWidth || 700;
         const H = Math.max(200, Math.min(280, W * 0.38));
@@ -266,11 +271,9 @@
         const cH = H - PAD.top  - PAD.bottom;
 
         const maxMin  = 1440;
-        const minMin  = Math.min(...data.map(d => d.dayMin));
         const dayClr  = getCSS('--day-clr');
         const ngtClr  = getCSS('--night-clr');
         const txtSec  = getCSS('--text-sec');
-        const txtPri  = getCSS('--text-pri');
         const curDay  = currentDOY();
 
         // Grid lines
@@ -280,16 +283,15 @@
             const y = PAD.top + cH * (1 - h * 60 / maxMin);
             ctx.beginPath(); ctx.moveTo(PAD.left, y); ctx.lineTo(PAD.left + cW, y); ctx.stroke();
         }
-        // Month separators
         let doyStart = 0;
-        MONTH_DAYS.forEach((md, mi) => {
+        MONTH_DAYS.forEach((md) => {
             const x = PAD.left + (doyStart / 365) * cW;
             ctx.beginPath(); ctx.moveTo(x, PAD.top); ctx.lineTo(x, PAD.top + cH); ctx.stroke();
             doyStart += md;
         });
         ctx.setLineDash([]); ctx.globalAlpha = 1;
 
-        // Night area (filled first, under day area)
+        // Night area
         ctx.beginPath();
         data.forEach((d, i) => {
             const x = PAD.left + (i / 364) * cW;
@@ -318,7 +320,7 @@
         });
         ctx.stroke();
 
-        // Equinox line (720 min = 12h)
+        // Equinox line
         const eqY = PAD.top + cH * (1 - 720 / maxMin);
         ctx.beginPath(); ctx.moveTo(PAD.left, eqY); ctx.lineTo(PAD.left+cW, eqY);
         ctx.strokeStyle = txtSec; ctx.lineWidth = 1; ctx.setLineDash([4,4]); ctx.globalAlpha = 0.4; ctx.stroke();
@@ -335,7 +337,6 @@
             ctx.fillStyle = 'rgba(251,191,36,0.4)'; ctx.fill();
             ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI*2);
             ctx.fillStyle = '#F59E0B'; ctx.fill();
-            // vertical line
             ctx.beginPath(); ctx.moveTo(x, PAD.top); ctx.lineTo(x, PAD.top+cH);
             ctx.strokeStyle = '#F59E0B'; ctx.lineWidth = 1; ctx.setLineDash([3,3]); ctx.globalAlpha = 0.4; ctx.stroke();
             ctx.setLineDash([]); ctx.globalAlpha = 1;
@@ -348,7 +349,7 @@
             ctx.fillText(`${h}h`, PAD.left - 4, y + 3);
         }
 
-        // X axis labels (months)
+        // X axis labels
         ctx.textAlign = 'center'; ctx.fillStyle = txtSec; ctx.font = `9px "JetBrains Mono", monospace`;
         let doy = 0;
         MONTH_DAYS.forEach((md, mi) => {
@@ -359,7 +360,6 @@
             doy += md;
         });
 
-        // Mouse hover
         canvas._chartData = data;
         canvas._chartPad  = PAD;
         canvas._chartSize = { cW, cH, W, H };
@@ -387,17 +387,15 @@
         const ngtClr = getCSS('--night-clr');
         const txtSec = getCSS('--text-sec');
 
-        const diffs = data.map(d => d.swahiliHourMin); // minutes per swahili hour
-        const minV  = Math.min(...diffs); // ~43 min in winter at lat 32
-        const maxV  = Math.max(...diffs); // ~80 min in summer at lat 32
+        const diffs = data.map(d => d.swahiliHourMin);
+        const minV  = Math.min(...diffs);
+        const maxV  = Math.max(...diffs);
         const span  = maxV - minV || 1;
-        const mid   = 60; // standard 60 min
+        const mid   = 60;
         const curDay = currentDOY();
 
-        // Baseline at 60 min
         const baseline = PAD.top + cH * (1 - (mid - minV) / span);
 
-        // Fill above/below baseline
         ctx.beginPath();
         diffs.forEach((v, i) => {
             const x = PAD.left + (i / 364) * cW;
@@ -416,7 +414,6 @@
         ctx.lineTo(PAD.left + cW, baseline); ctx.lineTo(PAD.left, baseline); ctx.closePath();
         ctx.fillStyle = ngtClr; ctx.globalAlpha = 0.18; ctx.fill(); ctx.globalAlpha = 1;
 
-        // Line
         ctx.beginPath(); ctx.strokeStyle = dayClr; ctx.lineWidth = 2;
         diffs.forEach((v, i) => {
             const x = PAD.left + (i / 364) * cW;
@@ -425,12 +422,10 @@
         });
         ctx.stroke();
 
-        // Baseline (60 min)
         ctx.beginPath(); ctx.moveTo(PAD.left, baseline); ctx.lineTo(PAD.left + cW, baseline);
         ctx.strokeStyle = txtSec; ctx.lineWidth = 1.2; ctx.setLineDash([4,4]); ctx.globalAlpha = 0.5; ctx.stroke();
         ctx.setLineDash([]); ctx.globalAlpha = 1;
 
-        // Current day
         if (curDay >= 1 && curDay <= 365) {
             const x = PAD.left + ((curDay-1) / 364) * cW;
             const y = PAD.top + cH * (1 - (diffs[curDay-1] - minV) / span);
@@ -438,14 +433,12 @@
             ctx.fillStyle = '#F59E0B'; ctx.fill();
         }
 
-        // Y axis
         ctx.fillStyle = txtSec; ctx.font = `9px "JetBrains Mono",monospace`; ctx.textAlign = 'right';
         [minV, 60, maxV].forEach(v => {
             const y = PAD.top + cH * (1 - (v - minV) / span);
             ctx.fillText(`${v.toFixed(0)}m`, PAD.left - 4, y + 3);
         });
 
-        // X labels
         ctx.textAlign = 'center'; ctx.font = `9px "JetBrains Mono",monospace`;
         let doy = 0;
         MONTH_DAYS.forEach((md, mi) => {
@@ -456,17 +449,14 @@
             doy += md;
         });
 
-        // Label
         ctx.fillText('60m', PAD.left - 4, baseline + 3);
     }
 
-    function buildStatsGrid(data, cityName) {
+    function buildStatsGrid(data) {
         const maxDay = data.reduce((a,b) => a.dayMin > b.dayMin ? a : b);
         const minDay = data.reduce((a,b) => a.dayMin < b.dayMin ? a : b);
         const curDay = currentDOY();
         const today  = data[Math.min(curDay-1, 364)] || data[0];
-        const maxHour = (maxDay.dayMin / 12).toFixed(1);
-        const minHour = (minDay.dayMin / 12).toFixed(1);
 
         const maxMD = doyToMonthDay(maxDay.doy);
         const minMD = doyToMonthDay(minDay.doy);
@@ -493,7 +483,6 @@
         const MNAMES = isEn ? MONTH_NAMES_EN : MONTH_NAMES_AR;
         let doy = 1;
         const rows = MONTH_DAYS.map((md, mi) => {
-            // Average for month
             const slice = data.slice(doy - 1, doy - 1 + md);
             const avgDay   = slice.reduce((s,d)=>s+d.dayMin,0) / slice.length;
             const avgHour  = avgDay / 12;
@@ -514,6 +503,8 @@
         }).join('');
 
         document.getElementById('month-tbody').innerHTML = rows;
+
+        /* ✅ Bug 17 — تحديث رؤوس الجدول بناءً على اللغة المحفوظة */
         const th = document.querySelectorAll('#month-table th');
         const headers = isEn
             ? ['Month','Daylight (avg)','Swahili Hour','vs 60min','Longest Day','Shortest Day']
@@ -521,17 +512,15 @@
         th.forEach((t,i) => { if(headers[i]) t.textContent = headers[i]; });
     }
 
-    function buildSolarEvents(lat) {
+    function buildSolarEvents() {
         const MNAMES = isEn ? MONTH_NAMES_EN : MONTH_NAMES_AR;
-        // Find solstices and equinoxes
-        const data = yearData(lat);
+        const data = yearData(currentLat);
         let maxD = data[0], minD = data[0];
         let eq1 = null, eq2 = null;
         data.forEach(d => {
             if (d.dayMin > maxD.dayMin) maxD = d;
             if (d.dayMin < minD.dayMin) minD = d;
         });
-        // Equinoxes: closest to 720 min
         let eq1Diff = Infinity, eq2Diff = Infinity;
         data.forEach(d => {
             const diff = Math.abs(d.dayMin - 720);
@@ -562,10 +551,9 @@
 
     function renderAll() {
         const data = yearData(currentLat);
-        buildStatsGrid(data, currentCityName);
+        buildStatsGrid(data);
         buildMonthTable(data);
-        buildSolarEvents(currentLat);
-        // Small delay for canvas resize
+        buildSolarEvents();
         setTimeout(() => {
             drawDayLengthChart(data);
             drawHourDiffChart(data);
@@ -581,7 +569,7 @@
         canvas.onmousemove = (e) => {
             const rect = canvas.getBoundingClientRect();
             const mx   = e.clientX - rect.left;
-            const { PAD, cW, cH, W, H } = { PAD: canvas._chartPad, ...canvas._chartSize };
+            const { PAD, cW, cH } = { PAD: canvas._chartPad, ...canvas._chartSize };
             if (mx < PAD.left || mx > PAD.left + cW) { tooltip.style.display='none'; return; }
             const idx = Math.round((mx - PAD.left) / cW * 364);
             const d   = data[Math.max(0, Math.min(364, idx))];
@@ -596,10 +584,9 @@
         canvas.onmouseleave = () => { tooltip.style.display = 'none'; };
     }
 
-    // Initial render
+    /* تحميل أولي */
     renderAll();
 
-    // Redraw on resize
     window.addEventListener('resize', () => {
         const data = yearData(currentLat);
         drawDayLengthChart(data);
